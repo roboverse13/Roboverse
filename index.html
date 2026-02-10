@@ -1,1806 +1,693 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang=
+"en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The World of Robotics - How Robots Are Built</title>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600;700&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --primary: #ffd700;
-            --secondary: #ffed4e;
-            --accent: #ffa500;
-            --dark: #1a1a1a;
-            --darker: #0d0d0d;
-            --light: #2d2d2d;
-            --bg-white: #ffffff;
-            --text-dark: #1a1a1a;
-            --gradient-1: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
-            --gradient-2: linear-gradient(135deg, #ffed4e 0%, #ffa500 100%);
-            --gradient-tech: linear-gradient(45deg, #ffd700, #ffed4e, #ffa500);
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Rajdhani', sans-serif;
-            background: var(--bg-white);
-            color: var(--text-dark);
-            overflow-x: hidden;
-            line-height: 1.6;
-        }
-
-        /* Animated Background */
-        .bg-animation {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -1;
-            opacity: 0.08;
-            background: 
-                radial-gradient(circle at 20% 50%, var(--primary) 0%, transparent 50%),
-                radial-gradient(circle at 80% 80%, var(--accent) 0%, transparent 50%),
-                radial-gradient(circle at 40% 20%, var(--secondary) 0%, transparent 50%);
-            animation: float 20s ease-in-out infinite;
-        }
-
-        @keyframes float {
-            0%, 100% { transform: translate(0, 0) scale(1); }
-            33% { transform: translate(50px, -50px) scale(1.1); }
-            66% { transform: translate(-50px, 50px) scale(0.9); }
-        }
-
-        /* Header */
-        header {
-            background: rgba(255, 255, 255, 0.98);
-            backdrop-filter: blur(10px);
-            padding: 1.5rem 2rem;
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-            border-bottom: 3px solid var(--primary);
-            box-shadow: 0 4px 20px rgba(255, 215, 0, 0.2);
-        }
-
-        nav {
-            max-width: 1200px;
-            margin: 0 auto;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 1rem;
-        }
-
-        .logo {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 2rem;
-            font-weight: 900;
-            background: var(--gradient-tech);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            animation: glow 3s ease-in-out infinite;
-        }
-
-        @keyframes glow {
-            0%, 100% { filter: drop-shadow(0 0 10px var(--primary)); }
-            50% { filter: drop-shadow(0 0 20px var(--secondary)); }
-        }
-
-        .nav-links {
-            display: flex;
-            gap: 2rem;
-            list-style: none;
-            flex-wrap: wrap;
-            align-items: center;
-        }
-
-        .nav-links a {
-            color: var(--text-dark);
-            text-decoration: none;
-            font-weight: 600;
-            font-size: 1.1rem;
-            transition: all 0.3s ease;
-            position: relative;
-        }
-
-        .nav-links a::after {
-            content: '';
-            position: absolute;
-            bottom: -5px;
-            left: 0;
-            width: 0;
-            height: 2px;
-            background: var(--accent);
-            transition: width 0.3s ease;
-        }
-
-        .nav-links a:hover::after {
-            width: 100%;
-        }
-
-        .nav-links a:hover {
-            color: var(--accent);
-            transform: translateY(-2px);
-        }
-
-        /* Auth Button Styles */
-        .auth-btn {
-            background: var(--gradient-tech);
-            color: var(--dark);
-            border: none;
-            padding: 0.7rem 1.5rem;
-            border-radius: 25px;
-            font-weight: 700;
-            font-size: 1rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
-            font-family: 'Rajdhani', sans-serif;
-        }
-
-        .auth-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 6px 25px rgba(255, 215, 0, 0.5);
-        }
-
-        .user-info {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-
-        .user-avatar {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            border: 2px solid var(--primary);
-        }
-
-        .user-name {
-            font-weight: 600;
-            color: var(--text-dark);
-        }
-
-        .logout-btn {
-            background: transparent;
-            border: 2px solid var(--accent);
-            color: var(--accent);
-            padding: 0.5rem 1rem;
-            border-radius: 20px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .logout-btn:hover {
-            background: var(--accent);
-            color: white;
-        }
-
-        /* AI Chatbot Button - Floating */
-        .chatbot-toggle {
-            position: fixed;
-            bottom: 30px;
-            right: 30px;
-            width: 70px;
-            height: 70px;
-            border-radius: 50%;
-            background: var(--gradient-tech);
-            border: none;
-            cursor: pointer;
-            box-shadow: 0 8px 30px rgba(255, 215, 0, 0.5);
-            z-index: 1500;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 2rem;
-            transition: all 0.3s ease;
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); box-shadow: 0 8px 30px rgba(255, 215, 0, 0.5); }
-            50% { transform: scale(1.05); box-shadow: 0 10px 40px rgba(255, 215, 0, 0.7); }
-        }
-
-        .chatbot-toggle:hover {
-            transform: scale(1.1) rotate(5deg);
-        }
-
-        .chatbot-toggle.active {
-            background: linear-gradient(135deg, #ff6b6b, #ee5a6f);
-        }
-
-        /* Chatbot Container */
-        .chatbot-container {
-            position: fixed;
-            bottom: 120px;
-            right: 30px;
-            width: 400px;
-            height: 600px;
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            border: 3px solid var(--primary);
-            display: none;
-            flex-direction: column;
-            z-index: 1500;
-            overflow: hidden;
-            animation: slideUp 0.3s ease-out;
-        }
-
-        @keyframes slideUp {
-            from {
-                opacity: 0;
-                transform: translateY(50px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .chatbot-container.active {
-            display: flex;
-        }
-
-        /* Chatbot Header */
-        .chatbot-header {
-            background: var(--gradient-tech);
-            padding: 1.5rem;
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            border-bottom: 2px solid var(--accent);
-        }
-
-        .chatbot-header-icon {
-            font-size: 2rem;
-            animation: bounce 2s infinite;
-        }
-
-        @keyframes bounce {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-5px); }
-        }
-
-        .chatbot-header-text h3 {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 1.3rem;
-            color: var(--dark);
-            margin: 0;
-        }
-
-        .chatbot-header-text p {
-            font-size: 0.9rem;
-            color: var(--dark);
-            opacity: 0.8;
-            margin: 0;
-        }
-
-        /* Chatbot Messages */
-        .chatbot-messages {
-            flex: 1;
-            overflow-y: auto;
-            padding: 1.5rem;
-            background: linear-gradient(to bottom, #fafafa 0%, #fff 100%);
-        }
-
-        .chatbot-messages::-webkit-scrollbar {
-            width: 8px;
-        }
-
-        .chatbot-messages::-webkit-scrollbar-track {
-            background: #f1f1f1;
-            border-radius: 10px;
-        }
-
-        .chatbot-messages::-webkit-scrollbar-thumb {
-            background: var(--primary);
-            border-radius: 10px;
-        }
-
-        .message {
-            margin-bottom: 1rem;
-            display: flex;
-            gap: 0.8rem;
-            animation: fadeIn 0.3s ease-out;
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .message.user {
-            flex-direction: row-reverse;
-        }
-
-        .message-avatar {
-            width: 35px;
-            height: 35px;
-            border-radius: 50%;
-            flex-shrink: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.2rem;
-        }
-
-        .message.bot .message-avatar {
-            background: var(--gradient-tech);
-        }
-
-        .message.user .message-avatar {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        }
-
-        .message-content {
-            max-width: 75%;
-            padding: 0.8rem 1.2rem;
-            border-radius: 15px;
-            line-height: 1.6;
-        }
-
-        .message.bot .message-content {
-            background: linear-gradient(135deg, rgba(255, 215, 0, 0.1) 0%, rgba(255, 165, 0, 0.1) 100%);
-            border: 1px solid var(--primary);
-            border-bottom-left-radius: 5px;
-        }
-
-        .message.user .message-content {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border-bottom-right-radius: 5px;
-        }
-
-        .typing-indicator {
-            display: flex;
-            gap: 5px;
-            padding: 1rem;
-        }
-
-        .typing-indicator span {
-            width: 8px;
-            height: 8px;
-            background: var(--accent);
-            border-radius: 50%;
-            animation: typing 1.4s infinite;
-        }
-
-        .typing-indicator span:nth-child(2) {
-            animation-delay: 0.2s;
-        }
-
-        .typing-indicator span:nth-child(3) {
-            animation-delay: 0.4s;
-        }
-
-        @keyframes typing {
-            0%, 60%, 100% { transform: translateY(0); opacity: 0.5; }
-            30% { transform: translateY(-10px); opacity: 1; }
-        }
-
-        /* Chatbot Input */
-        .chatbot-input {
-            padding: 1.2rem;
-            border-top: 2px solid #eee;
-            background: white;
-            display: flex;
-            gap: 0.8rem;
-        }
-
-        .chatbot-input input {
-            flex: 1;
-            padding: 0.8rem 1.2rem;
-            border: 2px solid var(--primary);
-            border-radius: 25px;
-            font-size: 1rem;
-            font-family: 'Rajdhani', sans-serif;
-            outline: none;
-            transition: all 0.3s ease;
-        }
-
-        .chatbot-input input:focus {
-            border-color: var(--accent);
-            box-shadow: 0 0 10px rgba(255, 165, 0, 0.2);
-        }
-
-        .chatbot-input button {
-            width: 45px;
-            height: 45px;
-            border-radius: 50%;
-            background: var(--gradient-tech);
-            border: none;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.3rem;
-            transition: all 0.3s ease;
-        }
-
-        .chatbot-input button:hover {
-            transform: scale(1.1) rotate(10deg);
-        }
-
-        .chatbot-input button:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-
-        /* Quick Questions */
-        .quick-questions {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.5rem;
-            margin-top: 0.5rem;
-        }
-
-        .quick-question-btn {
-            background: white;
-            border: 2px solid var(--primary);
-            padding: 0.5rem 1rem;
-            border-radius: 20px;
-            font-size: 0.85rem;
-            font-family: 'Rajdhani', sans-serif;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-weight: 600;
-        }
-
-        .quick-question-btn:hover {
-            background: var(--gradient-tech);
-            transform: translateY(-2px);
-        }
-
-        /* Modal Styles (from previous code) */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.7);
-            z-index: 2000;
-            justify-content: center;
-            align-items: center;
-            backdrop-filter: blur(5px);
-        }
-
-        .modal.active {
-            display: flex;
-        }
-
-        .modal-content {
-            background: white;
-            padding: 3rem;
-            border-radius: 20px;
-            width: 90%;
-            max-width: 450px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            border: 3px solid var(--primary);
-            position: relative;
-            animation: slideIn 0.3s ease-out;
-        }
-
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateY(-50px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .close-modal {
-            position: absolute;
-            top: 1rem;
-            right: 1rem;
-            background: none;
-            border: none;
-            font-size: 2rem;
-            cursor: pointer;
-            color: var(--text-dark);
-            transition: all 0.3s ease;
-        }
-
-        .close-modal:hover {
-            color: var(--accent);
-            transform: rotate(90deg);
-        }
-
-        .modal-title {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 2rem;
-            font-weight: 700;
-            margin-bottom: 2rem;
-            text-align: center;
-            background: var(--gradient-tech);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .form-group {
-            margin-bottom: 1.5rem;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 0.5rem;
-            font-weight: 600;
-            color: var(--text-dark);
-        }
-
-        .form-group input {
-            width: 100%;
-            padding: 0.8rem;
-            border: 2px solid var(--primary);
-            border-radius: 10px;
-            font-size: 1rem;
-            font-family: 'Rajdhani', sans-serif;
-            transition: all 0.3s ease;
-        }
-
-        .form-group input:focus {
-            outline: none;
-            border-color: var(--accent);
-            box-shadow: 0 0 10px rgba(255, 165, 0, 0.2);
-        }
-
-        .submit-btn {
-            width: 100%;
-            background: var(--gradient-tech);
-            color: var(--dark);
-            border: none;
-            padding: 1rem;
-            border-radius: 10px;
-            font-weight: 700;
-            font-size: 1.1rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-family: 'Rajdhani', sans-serif;
-        }
-
-        .submit-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(255, 215, 0, 0.4);
-        }
-
-        .toggle-form {
-            text-align: center;
-            margin-top: 1.5rem;
-            color: var(--text-dark);
-        }
-
-        .toggle-form a {
-            color: var(--accent);
-            text-decoration: none;
-            font-weight: 700;
-            cursor: pointer;
-        }
-
-        .toggle-form a:hover {
-            text-decoration: underline;
-        }
-
-        .google-btn {
-            width: 100%;
-            background: white;
-            border: 2px solid var(--primary);
-            padding: 1rem;
-            border-radius: 10px;
-            font-weight: 600;
-            font-size: 1rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
-            margin-top: 1rem;
-        }
-
-        .google-btn:hover {
-            background: #f8f9fa;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-        }
-
-        .divider {
-            text-align: center;
-            margin: 1.5rem 0;
-            position: relative;
-        }
-
-        .divider::before {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 0;
-            right: 0;
-            height: 1px;
-            background: #ddd;
-        }
-
-        .divider span {
-            background: white;
-            padding: 0 1rem;
-            position: relative;
-            color: #666;
-        }
-
-        .error-message {
-            background: #fee;
-            color: #c33;
-            padding: 0.8rem;
-            border-radius: 8px;
-            margin-bottom: 1rem;
-            display: none;
-            border-left: 4px solid #c33;
-        }
-
-        .error-message.show {
-            display: block;
-        }
-
-        /* Hero Section */
-        .hero {
-            padding: 6rem 2rem;
-            text-align: center;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .hero::before {
-            content: '🤖';
-            position: absolute;
-            font-size: 30rem;
-            opacity: 0.03;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            animation: rotate 30s linear infinite;
-        }
-
-        @keyframes rotate {
-            from { transform: translate(-50%, -50%) rotate(0deg); }
-            to { transform: translate(-50%, -50%) rotate(360deg); }
-        }
-
-        .hero h1 {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 4rem;
-            font-weight: 900;
-            margin-bottom: 1rem;
-            background: var(--gradient-tech);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            animation: slideDown 1s ease-out;
-        }
-
-        @keyframes slideDown {
-            from {
-                opacity: 0;
-                transform: translateY(-50px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .hero p {
-            font-size: 1.5rem;
-            margin-bottom: 2rem;
-            color: var(--text-dark);
-            font-weight: 600;
-            animation: slideUp 1s ease-out 0.2s both;
-        }
-
-        @keyframes slideUp {
-            from {
-                opacity: 0;
-                transform: translateY(50px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        /* Container */
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 2rem;
-        }
-
-        /* Section Styling */
-        section {
-            padding: 4rem 2rem;
-            position: relative;
-        }
-
-        .section-title {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 2.5rem;
-            font-weight: 700;
-            margin-bottom: 3rem;
-            text-align: center;
-            position: relative;
-            padding-bottom: 1rem;
-        }
-
-        .section-title::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 100px;
-            height: 4px;
-            background: var(--gradient-1);
-            border-radius: 2px;
-        }
-
-        /* Process Steps */
-        .process-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 2rem;
-            margin-top: 3rem;
-        }
-
-        .process-step {
-            background: linear-gradient(135deg, rgba(255, 215, 0, 0.1) 0%, rgba(255, 165, 0, 0.1) 100%);
-            padding: 2rem;
-            border-radius: 15px;
-            border: 2px solid var(--primary);
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .process-step::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(255, 215, 0, 0.1) 0%, transparent 70%);
-            transition: all 0.5s ease;
-            opacity: 0;
-        }
-
-        .process-step:hover::before {
-            opacity: 1;
-            transform: translate(25%, 25%);
-        }
-
-        .process-step:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 15px 40px rgba(255, 215, 0, 0.3);
-            border-color: var(--accent);
-        }
-
-        .step-number {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 3rem;
-            font-weight: 900;
-            background: var(--gradient-tech);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            margin-bottom: 1rem;
-        }
-
-        .process-step h3 {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 1.5rem;
-            margin-bottom: 1rem;
-            color: var(--text-dark);
-        }
-
-        .process-step p {
-            color: var(--text-dark);
-            line-height: 1.8;
-            font-size: 1.1rem;
-        }
-
-        /* Robot Types Grid */
-        .robot-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 2rem;
-            margin-top: 3rem;
-        }
-
-        .robot-card {
-            background: rgba(255, 255, 255, 0.9);
-            padding: 2rem;
-            border-radius: 15px;
-            border: 2px solid var(--primary);
-            transition: all 0.3s ease;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-        }
-
-        .robot-card:hover {
-            transform: translateY(-10px) scale(1.02);
-            box-shadow: 0 15px 40px rgba(255, 215, 0, 0.3);
-            border-color: var(--accent);
-        }
-
-        .robot-icon {
-            font-size: 4rem;
-            display: block;
-            text-align: center;
-            margin-bottom: 1rem;
-        }
-
-        .robot-card h3 {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 1.5rem;
-            margin-bottom: 1rem;
-            text-align: center;
-            color: var(--text-dark);
-        }
-
-        .robot-card ul {
-            list-style: none;
-            padding: 0;
-        }
-
-        .robot-card ul li {
-            padding: 0.5rem 0;
-            padding-left: 1.5rem;
-            position: relative;
-            color: var(--text-dark);
-        }
-
-        .robot-card ul li::before {
-            content: '⚡';
-            position: absolute;
-            left: 0;
-            color: var(--accent);
-        }
-
-        /* Components Grid */
-        .components-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1.5rem;
-            margin-top: 3rem;
-        }
-
-        .component-item {
-            background: linear-gradient(135deg, rgba(255, 215, 0, 0.1) 0%, rgba(255, 237, 78, 0.1) 100%);
-            padding: 1.5rem;
-            border-radius: 12px;
-            border: 2px solid var(--primary);
-            transition: all 0.3s ease;
-        }
-
-        .component-item:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 30px rgba(255, 215, 0, 0.2);
-            border-color: var(--accent);
-        }
-
-        .component-item h4 {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 1.3rem;
-            margin-bottom: 0.8rem;
-            color: var(--text-dark);
-        }
-
-        .component-item p {
-            color: var(--text-dark);
-            line-height: 1.6;
-        }
-
-        /* Features Container */
-        .features-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 2rem;
-            margin-top: 3rem;
-        }
-
-        .feature-box {
-            background: rgba(255, 255, 255, 0.95);
-            padding: 2rem;
-            border-radius: 15px;
-            border: 2px solid var(--primary);
-            transition: all 0.3s ease;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-        }
-
-        .feature-box:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 15px 35px rgba(255, 215, 0, 0.25);
-            border-color: var(--accent);
-        }
-
-        .feature-box h3 {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 1.5rem;
-            margin-bottom: 1rem;
-            color: var(--text-dark);
-        }
-
-        .feature-box p {
-            color: var(--text-dark);
-            line-height: 1.8;
-        }
-
-        /* Fade-in Animation */
-        .fade-in {
-            opacity: 0;
-            transform: translateY(30px);
-            transition: all 0.6s ease-out;
-        }
-
-        .fade-in.visible {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        /* Footer */
-        footer {
-            background: linear-gradient(135deg, var(--dark) 0%, var(--darker) 100%);
-            color: var(--primary);
-            text-align: center;
-            padding: 3rem 2rem;
-            margin-top: 4rem;
-            border-top: 4px solid var(--primary);
-        }
-
-        footer p {
-            font-size: 1.2rem;
-            font-weight: 600;
-        }
-
-        .footer-links {
-            margin-top: 1.5rem;
-            display: flex;
-            justify-content: center;
-            gap: 2rem;
-            flex-wrap: wrap;
-        }
-
-        .footer-links a {
-            color: var(--secondary);
-            text-decoration: none;
-            font-weight: 600;
-            transition: all 0.3s ease;
-        }
-
-        .footer-links a:hover {
-            color: var(--accent);
-            transform: translateY(-2px);
-        }
-
-        /* Responsive Design */
-        @media (max-width: 768px) {
-            .hero h1 {
-                font-size: 2.5rem;
-            }
-
-            .hero p {
-                font-size: 1.2rem;
-            }
-
-            .section-title {
-                font-size: 2rem;
-            }
-
-            .logo {
-                font-size: 1.5rem;
-            }
-
-            .nav-links {
-                gap: 1rem;
-            }
-
-            .nav-links a {
-                font-size: 1rem;
-            }
-
-            .modal-content {
-                padding: 2rem;
-            }
-
-            .chatbot-container {
-                width: 100%;
-                height: 100%;
-                bottom: 0;
-                right: 0;
-                border-radius: 0;
-            }
-
-            .chatbot-toggle {
-                bottom: 20px;
-                right: 20px;
-                width: 60px;
-                height: 60px;
-            }
-        }
-    </style>
+<meta charset=
+"UTF-8">
+<meta name=
+"viewport" content=
+"width=device-width, initial-scale=1.0">
+<title>The World of Robotics - How Robots Are Built</title>
+<link
+href=
+"https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900
+&family=Rajdhani:wght@300;400;600;700&display=swap" rel=
+"stylesheet">
+<style>
+:root {
+--primary: #ffd700;
+--secondary: #ffed4e;
+--accent: #ffa500;
+--dark: #1a1a1a;
+--bg-white: #ffffff;
+--text-dark: #1a1a1a;
+--gradient-tech: linear-gradient(45deg, #ffd700, #ffed4e, #ffa500);
+}
+* {
+margin: 0;
+padding: 0;
+box-sizing: border-box;
+}
+body {
+font-family:
+'Rajdhani'
+, sans-serif;
+background: var(--bg-white);
+color: var(--text-dark);
+overflow-x: hidden;
+line-height: 1.6;
+}
+.bg-animation {
+position: fixed;
+top: 0;
+left: 0;
+width: 100%;
+height: 100%;
+z-index: -1;
+opacity: 0.08;
+background:
+radial-gradient(circle at 20% 50%, var(--primary) 0%,transparent 50%),
+radial-gradient(circle at 80% 80%, var(--accent) 0%,
+transparent 50%);
+animation: float 20s ease-in-out infinite;
+}
+@keyframes float {
+0%, 100% { transform: translate(0, 0) scale(1); }
+50% { transform: translate(50px, -50px) scale(1.1); }
+}
+header {
+background: rgba(255, 255, 255, 0.98);
+backdrop-filter: blur(10px);
+padding: 1.5rem 2rem;
+position: sticky;
+top: 0;
+z-index: 1000;
+border-bottom: 3px solid var(--primary);
+box-shadow: 0 4px 20px rgba(255, 215, 0, 0.2);
+}
+nav {
+max-width: 1200px;
+margin: 0 auto;
+display: flex;
+justify-content: space-between;
+align-items: center;
+flex-wrap: wrap;
+gap: 1rem;
+}
+.logo {
+font-family:
+'Orbitron'
+, sans-serif;
+font-size: 2rem;
+font-weight: 900;
+background: var(--gradient-tech);
+-webkit-background-clip: text;
+-webkit-text-fill-color: transparent;
+animation: glow 3s ease-in-out infinite;
+}
+@keyframes glow {
+0%, 100% { filter: drop-shadow(0 0 10px var(--primary)); }50% { filter: drop-shadow(0 0 20px var(--secondary)); }
+}
+.nav-links {
+display: flex;
+gap: 2rem;
+list-style: none;
+flex-wrap: wrap;
+align-items: center;
+}
+.nav-links a {
+color: var(--text-dark);
+text-decoration: none;
+font-weight: 600;
+font-size: 1.1rem;
+transition: all 0.3s ease;
+position: relative;
+}
+.nav-links a::after {
+content:
+''
+;
+position: absolute;
+bottom: -5px;
+left: 0;
+width: 0;
+height: 2px;
+background: var(--accent);
+transition: width 0.3s ease;
+}
+.nav-links a:hover::after {
+width: 100%;
+}
+.auth-btn {
+background: var(--gradient-tech);
+color: var(--dark);
+border: none;
+padding: 0.7rem 1.5rem;
+border-radius: 25px;
+font-weight: 700;
+font-size: 1rem;
+cursor: pointer;transition: all 0.3s ease;
+box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
+}
+.auth-btn:hover {
+transform: translateY(-3px);
+box-shadow: 0 6px 25px rgba(255, 215, 0, 0.5);
+}
+.chatbot-toggle {
+position: fixed;
+bottom: 30px;
+right: 30px;
+width: 70px;
+height: 70px;
+border-radius: 50%;
+background: var(--gradient-tech);
+border: none;
+cursor: pointer;
+box-shadow: 0 8px 30px rgba(255, 215, 0, 0.5);
+z-index: 1500;
+display: flex;
+align-items: center;
+justify-content: center;
+font-size: 2rem;
+transition: all 0.3s ease;
+animation: pulse 2s infinite;
+}
+@keyframes pulse {
+0%, 100% { transform: scale(1); }
+50% { transform: scale(1.05); }
+}
+.chatbot-toggle:hover {
+transform: scale(1.1) rotate(5deg);
+}
+.chatbot-container {
+position: fixed;
+bottom: 120px;
+right: 30px;
+width: 400px;
+height: 600px;background: white;
+border-radius: 20px;
+box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+border: 3px solid var(--primary);
+display: none;
+flex-direction: column;
+z-index: 1500;
+overflow: hidden;
+animation: slideUp 0.3s ease-out;
+}
+@keyframes slideUp {
+from {
+opacity: 0;
+transform: translateY(50px);
+}
+to {
+opacity: 1;
+transform: translateY(0);
+}
+}
+.chatbot-container.active {
+display: flex;
+}
+.chatbot-header {
+background: var(--gradient-tech);
+padding: 1.5rem;
+display: flex;
+align-items: center;
+gap: 1rem;
+}
+.chatbot-header-icon {
+font-size: 2rem;
+}
+.chatbot-header-text h3 {
+font-family:
+'Orbitron'
+, sans-serif;
+font-size: 1.3rem;
+color: var(--dark);
+margin: 0;
+}.chatbot-header-text p {
+font-size: 0.9rem;
+color: var(--dark);
+opacity: 0.8;
+margin: 0;
+}
+.chatbot-messages {
+flex: 1;
+overflow-y: auto;
+padding: 1.5rem;
+background: linear-gradient(to bottom, #fafafa 0%, #fff 100%);
+}
+.chatbot-messages::-webkit-scrollbar {
+width: 8px;
+}
+.chatbot-messages::-webkit-scrollbar-thumb {
+background: var(--primary);
+border-radius: 10px;
+}
+.message {
+margin-bottom: 1rem;
+display: flex;
+gap: 0.8rem;
+animation: fadeIn 0.3s ease-out;
+}
+@keyframes fadeIn {
+from {
+opacity: 0;
+transform: translateY(10px);
+}
+to {
+opacity: 1;
+transform: translateY(0);
+}
+}
+.message.user {
+flex-direction: row-reverse;}
+.message-avatar {
+width: 35px;
+height: 35px;
+border-radius: 50%;
+flex-shrink: 0;
+display: flex;
+align-items: center;
+justify-content: center;
+font-size: 1.2rem;
+}
+.message.bot .message-avatar {
+background: var(--gradient-tech);
+}
+.message.user .message-avatar {
+background: linear-gradient(135deg, #667eea 0%, #764ba2
+100%);
+}
+.message-content {
+max-width: 75%;
+padding: 0.8rem 1.2rem;
+border-radius: 15px;
+line-height: 1.6;
+}
+.message.bot .message-content {
+background: linear-gradient(135deg, rgba(255, 215, 0, 0.1) 0%,
+rgba(255, 165, 0, 0.1) 100%);
+border: 1px solid var(--primary);
+border-bottom-left-radius: 5px;
+}
+.message.user .message-content {
+background: linear-gradient(135deg, #667eea 0%, #764ba2
+100%);
+color: white;
+border-bottom-right-radius: 5px;
+}
+.typing-indicator {display: none;
+gap: 5px;
+padding: 1rem;
+}
+.typing-indicator.active {
+display: flex;
+}
+.typing-indicator span {
+width: 8px;
+height: 8px;
+background: var(--accent);
+border-radius: 50%;
+animation: typing 1.4s infinite;
+}
+.typing-indicator span:nth-child(2) {
+animation-delay: 0.2s;
+}
+.typing-indicator span:nth-child(3) {
+animation-delay: 0.4s;
+}
+@keyframes typing {
+0%, 60%, 100% { transform: translateY(0); opacity: 0.5; }
+30% { transform: translateY(-10px); opacity: 1; }
+}
+.chatbot-input {
+padding: 1.2rem;
+border-top: 2px solid #eee;
+background: white;
+display: flex;
+gap: 0.8rem;
+}
+.chatbot-input input {
+flex: 1;
+padding: 0.8rem 1.2rem;
+border: 2px solid var(--primary);
+border-radius: 25px;
+font-size: 1rem;outline: none;
+transition: all 0.3s ease;
+}
+.chatbot-input input:focus {
+border-color: var(--accent);
+box-shadow: 0 0 10px rgba(255, 165, 0, 0.2);
+}
+.chatbot-input button {
+width: 45px;
+height: 45px;
+border-radius: 50%;
+background: var(--gradient-tech);
+border: none;
+cursor: pointer;
+display: flex;
+align-items: center;
+justify-content: center;
+font-size: 1.3rem;
+transition: all 0.3s ease;
+}
+.chatbot-input button:hover {
+transform: scale(1.1) rotate(10deg);
+}
+.chatbot-input button:disabled {
+opacity: 0.5;
+cursor: not-allowed;
+}
+.quick-questions {
+display: flex;
+flex-wrap: wrap;
+gap: 0.5rem;
+margin-top: 0.5rem;
+}
+.quick-question-btn {
+background: white;
+border: 2px solid var(--primary);
+padding: 0.5rem 1rem;
+border-radius: 20px;font-size: 0.85rem;
+cursor: pointer;
+transition: all 0.3s ease;
+font-weight: 600;
+}
+.quick-question-btn:hover {
+background: var(--gradient-tech);
+transform: translateY(-2px);
+}
+.api-notice {
+background: #fff3cd;
+border: 2px solid #ffc107;
+padding: 1rem;
+border-radius: 10px;
+margin-bottom: 1rem;
+font-size: 0.9rem;
+color: #856404;
+}
+.hero {
+padding: 6rem 2rem;
+text-align: center;
+position: relative;
+}
+.hero h1 {
+font-family:
+'Orbitron'
+, sans-serif;
+font-size: 4rem;
+font-weight: 900;
+margin-bottom: 1rem;
+background: var(--gradient-tech);
+-webkit-background-clip: text;
+-webkit-text-fill-color: transparent;
+}
+.hero p {
+font-size: 1.5rem;
+margin-bottom: 2rem;
+font-weight: 600;
+}
+.container {max-width: 1200px;
+margin: 0 auto;
+padding: 0 2rem;
+}
+section {
+padding: 4rem 2rem;
+}
+.section-title {
+font-family:
+'Orbitron'
+, sans-serif;
+font-size: 2.5rem;
+font-weight: 700;
+text-align: center;
+margin-bottom: 3rem;
+background: var(--gradient-tech);
+-webkit-background-clip: text;
+-webkit-text-fill-color: transparent;
+}
+.content-box {
+background: white;
+padding: 2rem;
+border-radius: 15px;
+box-shadow: 0 4px 20px rgba(255, 215, 0, 0.2);
+border: 2px solid var(--primary);
+margin-bottom: 2rem;
+}
+.content-box h3 {
+font-family:
+'Orbitron'
+, sans-serif;
+font-size: 1.8rem;
+margin-bottom: 1rem;
+color: var(--accent);
+}
+.content-box p {
+font-size: 1.1rem;
+line-height: 1.8;
+}
+footer {
+background: var(--dark);
+color: white;padding: 2rem;
+text-align: center;
+}
+@media (max-width: 768px) {
+.hero h1 {
+font-size: 2.5rem;
+}
+.chatbot-container {
+width: 90%;
+right: 5%;
+height: 500px;
+}
+}
+</style>
 </head>
 <body>
-    <div class="bg-animation"></div>
-
-    <header>
-        <nav>
-            <div class="logo">ROBOTICS 🤖</div>
-            <ul class="nav-links">
-                <li><a href="#home">Home</a></li>
-                <li><a href="#process">Process</a></li>
-                <li><a href="#types">Types</a></li>
-                <li><a href="#components">Components</a></li>
-                <li><a href="#features">Features</a></li>
-                <li id="auth-container">
-                    <button class="auth-btn" id="loginBtn">Sign In 🔐</button>
-                </li>
-            </ul>
-        </nav>
-    </header>
-
-    <!-- Auth Modal -->
-    <div class="modal" id="authModal">
-        <div class="modal-content">
-            <button class="close-modal" id="closeModal">&times;</button>
-            <h2 class="modal-title" id="modalTitle">Sign In</h2>
-            
-            <div class="error-message" id="errorMessage"></div>
-            
-            <form id="authForm">
-                <div class="form-group" id="nameGroup" style="display: none;">
-                    <label for="name">Full Name</label>
-                    <input type="text" id="name" placeholder="Enter your name">
-                </div>
-                
-                <div class="form-group">
-                    <label for="email">Email</label>
-                    <input type="email" id="email" placeholder="Enter your email" required>
-                </div>
-                
-                <div class="form-group">
-                    <label for="password">Password</label>
-                    <input type="password" id="password" placeholder="Enter your password" required>
-                </div>
-                
-                <button type="submit" class="submit-btn" id="submitBtn">Sign In</button>
-                
-                <div class="divider">
-                    <span>OR</span>
-                </div>
-                
-                <button type="button" class="google-btn" id="googleBtn">
-                    <svg width="20" height="20" viewBox="0 0 48 48">
-                        <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"></path>
-                        <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"></path>
-                        <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"></path>
-                        <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"></path>
-                    </svg>
-                    Continue with Google
-                </button>
-            </form>
-            
-            <div class="toggle-form">
-                <span id="toggleText">Don't have an account?</span>
-                <a id="toggleLink">Sign Up</a>
-            </div>
-        </div>
-    </div>
-
-    <!-- AI Chatbot Toggle Button -->
-    <button class="chatbot-toggle" id="chatbotToggle">
-        🤖
-    </button>
-
-    <!-- AI Chatbot Container -->
-    <div class="chatbot-container" id="chatbotContainer">
-        <div class="chatbot-header">
-            <div class="chatbot-header-icon">🤖</div>
-            <div class="chatbot-header-text">
-                <h3>Robotics AI Assistant</h3>
-                <p>Ask me anything about robotics!</p>
-            </div>
-        </div>
-        
-        <div class="chatbot-messages" id="chatbotMessages">
-            <div class="message bot">
-                <div class="message-avatar">🤖</div>
-                <div class="message-content">
-                    Hello! I'm your Robotics AI Assistant! 👋<br><br>
-                    I can help you with:<br>
-                    • Robot building & components<br>
-                    • Arduino & Raspberry Pi coding<br>
-                    • Circuit design & wiring<br>
-                    • Troubleshooting robot problems<br>
-                    • Project ideas & guidance<br><br>
-                    What would you like to know?
-                </div>
-            </div>
-            <div class="quick-questions">
-                <button class="quick-question-btn" data-question="How do I start building my first robot?">🚀 First Robot</button>
-                <button class="quick-question-btn" data-question="What Arduino board should I buy?">🔧 Arduino Board</button>
-                <button class="quick-question-btn" data-question="How do I connect a motor to Arduino?">⚡ Motor Control</button>
-                <button class="quick-question-btn" data-question="Explain what sensors are used in robotics">👁️ Sensors</button>
-            </div>
-        </div>
-        
-        <div class="chatbot-input">
-            <input type="text" id="chatInput" placeholder="Ask about robotics...">
-            <button id="sendBtn">🚀</button>
-        </div>
-    </div>
-
-    <section id="home" class="hero">
-        <div class="container">
-            <h1>The World of Robotics</h1>
-            <p>Discover How Robots Are Built & What Makes Them Amazing!</p>
-        </div>
-    </section>
-
-    <section id="process">
-        <div class="container">
-            <h2 class="section-title">How Robots Are Built 🔧</h2>
-            <div class="process-container">
-                <div class="process-step fade-in">
-                    <div class="step-number">01</div>
-                    <h3>Design & Planning</h3>
-                    <p>Engineers design the robot using CAD software. They decide what the robot will do, its size, shape, and which components are needed. Blueprint creation and 3D modeling happen here.</p>
-                </div>
-
-                <div class="process-step fade-in">
-                    <div class="step-number">02</div>
-                    <h3>Choose Components</h3>
-                    <p>Select microcontrollers (Arduino, Raspberry Pi), sensors (ultrasonic, camera), motors (servo, DC), power supply (batteries), and mechanical parts like wheels and chassis.</p>
-                </div>
-
-                <div class="process-step fade-in">
-                    <div class="step-number">03</div>
-                    <h3>Build the Body</h3>
-                    <p>Assemble the physical structure using metal, plastic, or 3D printed parts. Connect wheels, arms, joints, and create a sturdy frame for all components.</p>
-                </div>
-
-                <div class="process-step fade-in">
-                    <div class="step-number">04</div>
-                    <h3>Wire the Electronics</h3>
-                    <p>Connect sensors, motors, and power supply to the microcontroller using proper wiring. Solder connections carefully and ensure circuit safety with proper insulation.</p>
-                </div>
-
-                <div class="process-step fade-in">
-                    <div class="step-number">05</div>
-                    <h3>Program the Brain</h3>
-                    <p>Write code in languages like Python, C++, or Arduino C to control the robot's behavior. Include sensor reading, decision making, and motor control algorithms.</p>
-                </div>
-
-                <div class="process-step fade-in">
-                    <div class="step-number">06</div>
-                    <h3>Test & Debug</h3>
-                    <p>Test each function separately. Check sensors, motors, and logic. Fix bugs, adjust code, and improve performance through iterations until everything works perfectly.</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <section id="types" style="background: rgba(255, 255, 255, 0.5);">
-        <div class="container">
-            <h2 class="section-title">Types of Robots 🤖</h2>
-            <div class="robot-grid">
-                <div class="robot-card fade-in">
-                    <span class="robot-icon">🏭</span>
-                    <h3>Industrial Robots</h3>
-                    <ul>
-                        <li>Used in factories and manufacturing</li>
-                        <li>Perform welding, painting, assembly</li>
-                        <li>High speed and precision</li>
-                        <li>Work 24/7 without breaks</li>
-                        <li>Examples: Robotic arms, AGVs</li>
-                    </ul>
-                </div>
-
-                <div class="robot-card fade-in">
-                    <span class="robot-icon">🏥</span>
-                    <h3>Medical Robots</h3>
-                    <ul>
-                        <li>Assist in surgical procedures</li>
-                        <li>Extremely precise operations</li>
-                        <li>Reduce patient recovery time</li>
-                        <li>Enable remote surgery capabilities</li>
-                        <li>Examples: Da Vinci Surgical System</li>
-                    </ul>
-                </div>
-
-                <div class="robot-card fade-in">
-                    <span class="robot-icon">🚀</span>
-                    <h3>Space Robots</h3>
-                    <ul>
-                        <li>Designed for space exploration</li>
-                        <li>Work in extreme conditions</li>
-                        <li>Explore satellites and planets</li>
-                        <li>Autonomous navigation systems</li>
-                        <li>Examples: Mars Rover, Robonaut</li>
-                    </ul>
-                </div>
-
-                <div class="robot-card fade-in">
-                    <span class="robot-icon">🏠</span>
-                    <h3>Domestic Robots</h3>
-                    <ul>
-                        <li>Used in homes for daily tasks</li>
-                        <li>Help with cleaning and cooking</li>
-                        <li>Smart home integration features</li>
-                        <li>Understand voice commands</li>
-                        <li>Examples: Roomba, Alexa with robotics</li>
-                    </ul>
-                </div>
-
-                <div class="robot-card fade-in">
-                    <span class="robot-icon">🤝</span>
-                    <h3>Humanoid Robots</h3>
-                    <ul>
-                        <li>Look and act like humans</li>
-                        <li>Can walk, talk, and gesture</li>
-                        <li>Powered by AI and machine learning</li>
-                        <li>Used for customer service, entertainment</li>
-                        <li>Examples: Sophia, Atlas</li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <section id="components">
-        <div class="container">
-            <h2 class="section-title">Main Robot Components ⚙️</h2>
-            <div class="components-grid">
-                <div class="component-item fade-in">
-                    <h4>🧠 Microcontroller/Processor</h4>
-                    <p>The robot's brain - Arduino, Raspberry Pi, or custom chips. Makes all the decisions.</p>
-                </div>
-
-                <div class="component-item fade-in">
-                    <h4>👁️ Sensors</h4>
-                    <p>Sense the environment - ultrasonic, infrared, camera, temperature, pressure sensors.</p>
-                </div>
-
-                <div class="component-item fade-in">
-                    <h4>⚡ Motors & Actuators</h4>
-                    <p>Provide movement - DC motors, servo motors, stepper motors, hydraulic actuators.</p>
-                </div>
-
-                <div class="component-item fade-in">
-                    <h4>🔋 Power Supply</h4>
-                    <p>Energy source - lithium batteries, solar panels, or wired power connections.</p>
-                </div>
-
-                <div class="component-item fade-in">
-                    <h4>🔗 Mechanical Parts</h4>
-                    <p>Physical structure - gears, wheels, joints, chassis, arms, grippers.</p>
-                </div>
-
-                <div class="component-item fade-in">
-                    <h4>📡 Communication Module</h4>
-                    <p>For data transfer - WiFi, Bluetooth, RF modules, GPS.</p>
-                </div>
-
-                <div class="component-item fade-in">
-                    <h4>💾 Memory/Storage</h4>
-                    <p>Store data and programs - SD cards, EEPROM, cloud storage.</p>
-                </div>
-
-                <div class="component-item fade-in">
-                    <h4>🎮 Control Interface</h4>
-                    <p>Remote control via mobile app or computer - joysticks, buttons, touchscreen.</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <section id="features" style="background: rgba(255, 255, 255, 0.5);">
-        <div class="container">
-            <h2 class="section-title">Amazing Robot Features & Uses 🌟</h2>
-            <div class="features-container">
-                <div class="feature-box fade-in">
-                    <h3>🎯 Precision & Accuracy</h3>
-                    <p>Robots are extremely precise. They can perform micro-level tasks that are difficult for humans. This is crucial in surgery and manufacturing.</p>
-                </div>
-
-                <div class="feature-box fade-in">
-                    <h3>💪 Strength & Endurance</h3>
-                    <p>Can perform heavy lifting and continuous work without fatigue. Work 24/7 without breaks. Operate in dangerous environments safely.</p>
-                </div>
-
-                <div class="feature-box fade-in">
-                    <h3>🧮 Data Processing</h3>
-                    <p>Process large amounts of data quickly. Improve continuously through machine learning. Create patterns and predictions.</p>
-                </div>
-
-                <div class="feature-box fade-in">
-                    <h3>🌐 Connectivity</h3>
-                    <p>Stay connected to the internet. Use cloud computing. Multiple robots can coordinate together. Remote control and monitoring possible.</p>
-                </div>
-
-                <div class="feature-box fade-in">
-                    <h3>🔐 Safety Features</h3>
-                    <p>Built-in emergency stop buttons, collision detection, and safety protocols. Can work safely alongside humans.</p>
-                </div>
-
-                <div class="feature-box fade-in">
-                    <h3>🎓 Learning Ability</h3>
-                    <p>Modern robots equipped with AI and ML can learn. Improve from experience. Automatically adapt to new tasks.</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <section>
-        <div class="container">
-            <h2 class="section-title">What Do You Need to Build a Robot? 🛠️</h2>
-            <div class="features-container">
-                <div class="feature-box fade-in">
-                    <h3>📚 Knowledge & Skills</h3>
-                    <p><strong>Electronics:</strong> Circuits, components, soldering<br>
-                    <strong>Programming:</strong> Python, C++, Arduino<br>
-                    <strong>Mechanical:</strong> CAD design, 3D printing<br>
-                    <strong>Mathematics:</strong> Physics, calculus, algorithms</p>
-                </div>
-
-                <div class="feature-box fade-in">
-                    <h3>🔧 Tools & Equipment</h3>
-                    <p><strong>Hardware:</strong> Soldering iron, multimeter, screwdrivers<br>
-                    <strong>Software:</strong> Arduino IDE, CAD software, Python IDE<br>
-                    <strong>Machines:</strong> 3D printer (optional), laser cutter<br>
-                    <strong>Testing:</strong> Oscilloscope, power supply</p>
-                </div>
-
-                <div class="feature-box fade-in">
-                    <h3>💰 Budget & Materials</h3>
-                    <p><strong>Beginner:</strong> $100-200 (simple robots)<br>
-                    <strong>Intermediate:</strong> $200-600<br>
-                    <strong>Advanced:</strong> $600+ (complex projects)<br>
-                    <strong>Tip:</strong> Start small, reuse parts, join communities</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <footer>
-        <div class="container">
-            <p>&copy; 2026 Robotics Guide - How Robots Are Built</p>
-            <p style="margin-top: 1rem; font-size: 1rem; opacity: 0.8;">Robots around the world are helping humanity! 🌍🤖</p>
-            <div class="footer-links">
-                <a href="#home">Home</a>
-                <a href="#process">Process</a>
-                <a href="#types">Types</a>
-                <a href="#components">Components</a>
-            </div>
-        </div>
-    </footer>
-
-    <!-- Firebase SDK -->
-    <script type="module">
-        // Import Firebase SDK
-        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js';
-        import { getAnalytics, logEvent } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-analytics.js';
-        import { 
-            getAuth, 
-            createUserWithEmailAndPassword, 
-            signInWithEmailAndPassword,
-            signInWithPopup,
-            GoogleAuthProvider,
-            onAuthStateChanged,
-            signOut,
-            updateProfile
-        } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
-
-        // Firebase configuration
-        const firebaseConfig = {
-            apiKey: "AIzaSyDz6oxUYKWbeb9swFShbf-rsDfzPP6s2UU",
-            authDomain: "aman-3ee64.firebaseapp.com",
-            projectId: "aman-3ee64",
-            storageBucket: "aman-3ee64.firebasestorage.app",
-            messagingSenderId: "134662250108",
-            appId: "1:134662250108:web:fca670ce3b982f2cb7b3f9",
-            measurementId: "G-6N3R4JLCRL"
-        };
-
-        // Initialize Firebase
-        const app = initializeApp(firebaseConfig);
-        const analytics = getAnalytics(app);
-        const auth = getAuth(app);
-        const googleProvider = new GoogleAuthProvider();
-
-        // DOM Elements
-        const authModal = document.getElementById('authModal');
-        const loginBtn = document.getElementById('loginBtn');
-        const closeModal = document.getElementById('closeModal');
-        const authForm = document.getElementById('authForm');
-        const toggleLink = document.getElementById('toggleLink');
-        const toggleText = document.getElementById('toggleText');
-        const modalTitle = document.getElementById('modalTitle');
-        const submitBtn = document.getElementById('submitBtn');
-        const nameGroup = document.getElementById('nameGroup');
-        const googleBtn = document.getElementById('googleBtn');
-        const errorMessage = document.getElementById('errorMessage');
-        const authContainer = document.getElementById('auth-container');
-
-        let isSignUp = false;
-
-        // Show/Hide Modal
-        loginBtn.addEventListener('click', () => {
-            authModal.classList.add('active');
-            logEvent(analytics, 'login_modal_opened');
-        });
-
-        closeModal.addEventListener('click', () => {
-            authModal.classList.remove('active');
-            errorMessage.classList.remove('show');
-        });
-
-        authModal.addEventListener('click', (e) => {
-            if (e.target === authModal) {
-                authModal.classList.remove('active');
-                errorMessage.classList.remove('show');
-            }
-        });
-
-        // Toggle between Sign In and Sign Up
-        toggleLink.addEventListener('click', () => {
-            isSignUp = !isSignUp;
-            
-            if (isSignUp) {
-                modalTitle.textContent = 'Sign Up';
-                submitBtn.textContent = 'Sign Up';
-                toggleText.textContent = 'Already have an account?';
-                toggleLink.textContent = 'Sign In';
-                nameGroup.style.display = 'block';
-            } else {
-                modalTitle.textContent = 'Sign In';
-                submitBtn.textContent = 'Sign In';
-                toggleText.textContent = "Don't have an account?";
-                toggleLink.textContent = 'Sign Up';
-                nameGroup.style.display = 'none';
-            }
-            
-            errorMessage.classList.remove('show');
-        });
-
-        // Show Error Message
-        function showError(message) {
-            errorMessage.textContent = message;
-            errorMessage.classList.add('show');
-        }
-
-        // Email/Password Auth
-        authForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-            const name = document.getElementById('name').value;
-            
-            errorMessage.classList.remove('show');
-            
-            try {
-                if (isSignUp) {
-                    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-                    
-                    if (name) {
-                        await updateProfile(userCredential.user, {
-                            displayName: name
-                        });
-                    }
-                    
-                    logEvent(analytics, 'sign_up', { method: 'email' });
-                    console.log('✅ User signed up successfully!');
-                } else {
-                    await signInWithEmailAndPassword(auth, email, password);
-                    logEvent(analytics, 'login', { method: 'email' });
-                    console.log('✅ User signed in successfully!');
-                }
-                
-                authModal.classList.remove('active');
-                authForm.reset();
-            } catch (error) {
-                console.error('Auth error:', error);
-                
-                let message = 'An error occurred. Please try again.';
-                
-                if (error.code === 'auth/email-already-in-use') {
-                    message = 'This email is already registered. Please sign in.';
-                } else if (error.code === 'auth/weak-password') {
-                    message = 'Password should be at least 6 characters.';
-                } else if (error.code === 'auth/invalid-email') {
-                    message = 'Please enter a valid email address.';
-                } else if (error.code === 'auth/user-not-found') {
-                    message = 'No account found with this email.';
-                } else if (error.code === 'auth/wrong-password') {
-                    message = 'Incorrect password. Please try again.';
-                }
-                
-                showError(message);
-            }
-        });
-
-        // Google Sign In
-        googleBtn.addEventListener('click', async () => {
-            try {
-                await signInWithPopup(auth, googleProvider);
-                logEvent(analytics, 'login', { method: 'google' });
-                console.log('✅ User signed in with Google!');
-                authModal.classList.remove('active');
-            } catch (error) {
-                console.error('Google sign-in error:', error);
-                showError('Failed to sign in with Google. Please try again.');
-            }
-        });
-
-        // Auth State Observer
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                console.log('👤 User logged in:', user.email);
-                
-                authContainer.innerHTML = `
-                    <div class="user-info">
-                        ${user.photoURL ? 
-                            `<img src="${user.photoURL}" alt="User" class="user-avatar">` : 
-                            `<div class="user-avatar" style="background: var(--gradient-tech); display: flex; align-items: center; justify-content: center; font-weight: bold; color: var(--dark);">${user.displayName ? user.displayName[0].toUpperCase() : user.email[0].toUpperCase()}</div>`
-                        }
-                        <span class="user-name">${user.displayName || user.email.split('@')[0]}</span>
-                        <button class="logout-btn" id="logoutBtn">Logout</button>
-                    </div>
-                `;
-                
-                document.getElementById('logoutBtn').addEventListener('click', async () => {
-                    try {
-                        await signOut(auth);
-                        logEvent(analytics, 'logout');
-                        console.log('👋 User logged out');
-                    } catch (error) {
-                        console.error('Logout error:', error);
-                    }
-                });
-                
-                logEvent(analytics, 'user_active', {
-                    user_id: user.uid
-                });
-            } else {
-                console.log('🔓 No user logged in');
-                authContainer.innerHTML = `
-                    <button class="auth-btn" id="loginBtn">Sign In 🔐</button>
-                `;
-                
-                document.getElementById('loginBtn').addEventListener('click', () => {
-                    authModal.classList.add('active');
-                    logEvent(analytics, 'login_modal_opened');
-                });
-            }
-        });
-
-        // Analytics
-        logEvent(analytics, 'page_view', {
-            page_title: 'Robotics Guide - How Robots Are Built',
-            page_location: window.location.href
-        });
-
-        document.querySelectorAll('.nav-links a').forEach(link => {
-            link.addEventListener('click', function(e) {
-                const sectionName = this.textContent;
-                logEvent(analytics, 'navigation_click', {
-                    link_text: sectionName,
-                    target_section: this.getAttribute('href')
-                });
-            });
-        });
-
-        console.log('✅ Firebase Authentication initialized!');
-    </script>
-
-    <!-- AI Chatbot Script -->
-    <script>
-        // Chatbot Toggle
-        const chatbotToggle = document.getElementById('chatbotToggle');
-        const chatbotContainer = document.getElementById('chatbotContainer');
-        const chatbotMessages = document.getElementById('chatbotMessages');
-        const chatInput = document.getElementById('chatInput');
-        const sendBtn = document.getElementById('sendBtn');
-
-        let isChatbotOpen = false;
-
-        chatbotToggle.addEventListener('click', () => {
-            isChatbotOpen = !isChatbotOpen;
-            chatbotContainer.classList.toggle('active');
-            chatbotToggle.classList.toggle('active');
-            
-            if (isChatbotOpen) {
-                chatInput.focus();
-            }
-        });
-
-        // Quick Questions
-        document.querySelectorAll('.quick-question-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                const question = btn.getAttribute('data-question');
-                chatInput.value = question;
-                sendMessage();
-            });
-        });
-
-        // Send Message
-        sendBtn.addEventListener('click', sendMessage);
-        chatInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                sendMessage();
-            }
-        });
-
-        async function sendMessage() {
-            const message = chatInput.value.trim();
-            if (!message) return;
-
-            // Add user message
-            addMessage(message, 'user');
-            chatInput.value = '';
-            sendBtn.disabled = true;
-
-            // Show typing indicator
-            showTypingIndicator();
-
-            try {
-                // Call Claude API
-                const response = await fetch('https://api.anthropic.com/v1/messages', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'x-api-key': 'YOUR_ANTHROPIC_API_KEY_HERE', // User needs to add their own key
-                        'anthropic-version': '2023-06-01'
-                    },
-                    body: JSON.stringify({
-                        model: 'claude-sonnet-4-20250514',
-                        max_tokens: 1024,
-                        system: 'You are a helpful robotics expert assistant. Help users with robot building, Arduino/Raspberry Pi programming, circuit design, component selection, and troubleshooting. Be friendly, clear, and provide practical advice. Keep responses concise and actionable.',
-                        messages: [{
-                            role: 'user',
-                            content: message
-                        }]
-                    })
-                });
-
-                const data = await response.json();
-                hideTypingIndicator();
-
-                if (data.content && data.content[0]) {
-                    const botReply = data.content[0].text;
-                    addMessage(botReply, 'bot');
-                } else {
-                    addMessage('Sorry, I encountered an error. Please try again.', 'bot');
-                }
-            } catch (error) {
-                console.error('API Error:', error);
-                hideTypingIndicator();
-                addMessage('Oops! I\'m having trouble connecting. Please make sure the API key is configured correctly.', 'bot');
-            }
-
-            sendBtn.disabled = false;
-        }
-
-        function addMessage(text, sender) {
-            const messageDiv = document.createElement('div');
-            messageDiv.className = `message ${sender}`;
-            
-            const avatar = document.createElement('div');
-            avatar.className = 'message-avatar';
-            avatar.textContent = sender === 'bot' ? '🤖' : '👤';
-            
-            const content = document.createElement('div');
-            content.className = 'message-content';
-            content.textContent = text;
-            
-            messageDiv.appendChild(avatar);
-            messageDiv.appendChild(content);
-            
-            // Remove quick questions after first user message
-            const quickQuestions = chatbotMessages.querySelector('.quick-questions');
-            if (quickQuestions && sender === 'user') {
-                quickQuestions.remove();
-            }
-            
-            chatbotMessages.appendChild(messageDiv);
-            chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
-        }
-
-        function showTypingIndicator() {
-            const typingDiv = document.createElement('div');
-            typingDiv.className = 'message bot';
-            typingDiv.id = 'typingIndicator';
-            
-            const avatar = document.createElement('div');
-            avatar.className = 'message-avatar';
-            avatar.textContent = '🤖';
-            
-            const indicator = document.createElement('div');
-            indicator.className = 'message-content';
-            indicator.innerHTML = '<div class="typing-indicator"><span></span><span></span><span></span></div>';
-            
-            typingDiv.appendChild(avatar);
-            typingDiv.appendChild(indicator);
-            chatbotMessages.appendChild(typingDiv);
-            chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
-        }
-
-        function hideTypingIndicator() {
-            const indicator = document.getElementById('typingIndicator');
-            if (indicator) {
-                indicator.remove();
-            }
-        }
-    </script>
-
-    <script>
-        // Scroll Animation
-        const observerOptions = {
-            threshold: 0.1,
-            rootMargin: '0px 0px -50px 0px'
-        };
-
-        const observer = new IntersectionObserver(function(entries) {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('visible');
-                }
-            });
-        }, observerOptions);
-
-        document.querySelectorAll('.fade-in').forEach(el => {
-            observer.observe(el);
-        });
-
-        // Smooth Scrolling
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                const target = document.querySelector(this.getAttribute('href'));
-                if (target) {
-                    target.scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'start'
-                    });
-                }
-            });
-        });
-
-        // Parallax effect
-        window.addEventListener('scroll', () => {
-            const scrolled = window.pageYOffset;
-            const bg = document.querySelector('.bg-animation');
-            bg.style.transform = `translateY(${scrolled * 0.5}px)`;
-        });
-    </script>
-</body>
-</html>
+<div class=
+"bg-animation"></div>
+<header>
+<nav>
+<div class=
+"logo">ROBOTICS</div>
+<ul class=
+"nav-links">
+<li><a href=
+"#home">Home</a></li>
+<li><a href=
+"#about">About</a></li>
+<li><a href=
+"#components">Components</a></li>
+</ul>
+<div class=
+"auth-section">
+<button class=
+"auth-btn">Login</button>
+</div>
+</nav>
+</header>
+<section class=
+"hero" id=
+"home">
+<h1>The World of Robotics</h1>
+<p>Discover How Robots Are Built & Powered by AI</p>
+</section>
+<section id=
+"about">
+<div class=
+"container">
+<h2 class=
+"section-title">About Robotics</h2>
+<div class=
+"content-box">
+<h3>What is Robotics?</h3><p>Robotics is an interdisciplinary field that integrates
+computer science, engineering, and technology to design, construct, operate,
+and use robots. These intelligent machines can perform tasks autonomously or
+semi-autonomously, revolutionizing industries from manufacturing to
+healthcare.</p>
+</div>
+<div class=
+"content-box">
+<h3>The Future of Automation</h3>
+<p>As artificial intelligence continues to advance, robots are
+becoming smarter, more adaptive, and capable of learning from their
+environment. From self-driving cars to surgical robots, the applications are
+endless.</p>
+</div>
+</div>
+</section>
+<section id=
+"components">
+<div class=
+"container">
+<h2 class=
+"section-title">Robot Components</h2>
+<div class=
+"content-box">
+<h3>🔧 Mechanical Structure</h3>
+<p>The physical framework including motors, actuators, and
+joints that allow robots to move and interact with their environment.</p>
+</div>
+<div class=
+"content-box">
+<h3>🧠 Control System</h3>
+<p>The brain of the robot - microcontrollers and computers
+that process information and make decisions based on sensor inputs.</p>
+</div>
+<div class=
+"content-box">
+<h3>👁 Sensors</h3>
+<p>Cameras, proximity sensors, temperature sensors, and
+more that help robots perceive and understand their surroundings.</p>
+</div>
+</div>
+</section>
+<footer>
+<p>&copy; 2024 Robotics World. Powered by Claude AI. All rights
+reserved.</p>
+</footer>
+<button class=
+"chatbot-toggle" id=
+"chatbotToggle">🤖</button><div class=
+"chatbot-container" id=
+"chatbotContainer">
+<div class=
+"chatbot-header">
+<div class=
+"chatbot-header-icon">🤖</div>
+<div class=
+"chatbot-header-text">
+<h3>Robotics AI Assistant</h3>
+<p>Powered by Claude</p>
+</div>
+</div>
+<div class=
+"chatbot-messages" id=
+"chatbotMessages">
+<div class=
+"api-notice">
+<strong>⚙ Setup Required:</strong> Add your Anthropic
+API key at line 50 in the code. Get it from <a
+href=
+"https://console.anthropic.com/" target=
+"_blank" style=
+"color: #d39e00;
+font-weight: bold;
+">console.anthropic.com</a>
+</div>
+<div class=
+"message bot">
+<div class=
+"message-avatar">🤖</div>
+<div class=
+"message-content">
+Hello! I'm your Robotics AI Assistant powered by Claude.
+Ask me anything about robots, robotics, AI, or how they're built!
+<div class=
+"quick-questions">
+<button class=
+"quick-question-btn"
+data-question=
+"What are the main components of a robot?">Robot
+Components</button>
+<button class=
+"quick-question-btn"
+data-question=
+"How do robots use AI?">AI in Robotics</button>
+<button class=
+"quick-question-btn"
+data-question=
+"What are different types of robots?">Types of
+Robots</button>
+</div>
+</div>
+</div>
+</div>
+<div class=
+"typing-indicator" id=
+"typingIndicator">
+<span></span>
+<span></span>
+<span></span>
+</div>
+<div class=
+"chatbot-input">
+<input type=
+"text" id=
+"chatInput" placeholder=
+"Ask about
+robotics...">
+<button id=
+"sendBtn">📤</button>
+</div>
+</div>
+<script>
+// ==========================================
+// 🔑 ANTHROPIC API KEY CONFIGURATION
+// ==========================================
+// YAHAN APNI API KEY DAALEIN!
+// Get your API key from: https://console.anthropic.com/
+const ANTHROPIC_API_KEY =
+'YOUR_API_KEY_HERE'
+; // ⚠ YAHAN
+APNI API KEY DAALEIN
+const CLAUDE_MODEL =
+'claude-sonnet-4-20250514'
+;
+let conversationHistory = [];
+// ==========================================
+// CHATBOT FUNCTIONALITY
+// ==========================================
+const chatbotToggle = document.getElementById('chatbotToggle');
+const chatbotContainer =
+document.getElementById('chatbotContainer');
+const chatInput = document.getElementById('chatInput');
+const sendBtn = document.getElementById('sendBtn');
+const chatbotMessages =
+document.getElementById('chatbotMessages');
+const typingIndicator = document.getElementById('typingIndicator');
+chatbotToggle.addEventListener('click'
+, () => {
+chatbotContainer.classList.toggle('active');
+});
+sendBtn.addEventListener('click'
+, sendMessage);
+chatInput.addEventListener('keypress'
+, (e) => {
+if (e.key ===
+'Enter') {
+sendMessage();
+}
+});
+document.addEventListener('click'
+, (e) => {
+if (e.target.classList.contains('quick-question-btn')) {
+const question = e.target.getAttribute('data-question');
+chatInput.value = question;
+sendMessage();
+}
+});<script>
+// ==========================================
+// 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
+// =======================================
+// Get your API key from: https://console.anthropic.com/
+const ANTHROPIC_API_KEY =
+'YOUR_API_KEY_HERE'
+; // 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
+const CLAUDE_MODEL =
+'claude-sonnet-4-20250514'
+;
+let conversationHistory = [];
+// ==========================================
+// CHATBOT FUNCTIONALITY
+// ==========================================
+const chatbotToggle = document.getElementById('chatbotToggle');
+const chatbotContainer =
+document.getElementById('chatbotContainer');
+const chatInput = document.getElementById('chatInput');
+const sendBtn = document.getElementById('sendBtn');
+const chatbotMessages =
+document.getElementById('chatbotMessages');
+const typingIndicator = document.getElementById('typingIndicator');
+chatbotToggle.addEventListener('click'
+, () => {
+chatbotContainer.classList.toggle('active');
+});
+sendBtn.addEventListener('click'
+, sendMessage);
+chatInput.addEventListener('keypress'
+, (e) => {
+if (e.key ===
+'Enter') {
+sendMessage();
+}
+});
+document.addEventListener('click'
+, (e) => {
+if (e.target.classList.contains('quick-question-btn')) {
+const question = e.target.getAttribute('data-question');
+chatInput.value = question;
+sendMessage();
+}
+});
