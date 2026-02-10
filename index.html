@@ -1,0 +1,854 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The World of Robotics - How Robots Are Built</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #ffd700;
+            --secondary: #ffed4e;
+            --accent: #ffa500;
+            --dark: #1a1a1a;
+            --darker: #0d0d0d;
+            --light: #2d2d2d;
+            --bg-white: #ffffff;
+            --text-dark: #1a1a1a;
+            --gradient-1: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+            --gradient-2: linear-gradient(135deg, #ffed4e 0%, #ffa500 100%);
+            --gradient-tech: linear-gradient(45deg, #ffd700, #ffed4e, #ffa500);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Rajdhani', sans-serif;
+            background: var(--bg-white);
+            color: var(--text-dark);
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        /* Animated Background */
+        .bg-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.08;
+            background: 
+                radial-gradient(circle at 20% 50%, var(--primary) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, var(--accent) 0%, transparent 50%),
+                radial-gradient(circle at 40% 20%, var(--secondary) 0%, transparent 50%);
+            animation: float 20s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(50px, -50px) scale(1.1); }
+            66% { transform: translate(-50px, 50px) scale(0.9); }
+        }
+
+        /* Header */
+        header {
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(10px);
+            padding: 1.5rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            border-bottom: 3px solid var(--primary);
+            box-shadow: 0 4px 20px rgba(255, 215, 0, 0.2);
+        }
+
+        nav {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .logo {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2rem;
+            font-weight: 900;
+            background: var(--gradient-tech);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: glow 3s ease-in-out infinite;
+        }
+
+        @keyframes glow {
+            0%, 100% { filter: drop-shadow(0 0 10px var(--primary)); }
+            50% { filter: drop-shadow(0 0 20px var(--secondary)); }
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+            flex-wrap: wrap;
+        }
+
+        .nav-links a {
+            color: var(--text-dark);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--accent);
+            transition: width 0.3s ease;
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        .nav-links a:hover {
+            color: var(--accent);
+            transform: translateY(-2px);
+        }
+
+        /* Hero Section */
+        .hero {
+            padding: 6rem 2rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '🤖';
+            position: absolute;
+            font-size: 30rem;
+            opacity: 0.03;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            animation: rotate 30s linear infinite;
+        }
+
+        @keyframes rotate {
+            from { transform: translate(-50%, -50%) rotate(0deg); }
+            to { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+
+        .hero h1 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 4rem;
+            font-weight: 900;
+            margin-bottom: 1rem;
+            background: var(--gradient-tech);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: slideDown 1s ease-out;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .hero p {
+            font-size: 1.5rem;
+            margin-bottom: 2rem;
+            color: var(--text-dark);
+            font-weight: 600;
+            animation: slideUp 1s ease-out 0.2s both;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Container */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        /* Section Styling */
+        section {
+            padding: 4rem 2rem;
+            position: relative;
+        }
+
+        .section-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 3rem;
+            text-align: center;
+            position: relative;
+            padding-bottom: 1rem;
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 4px;
+            background: var(--gradient-tech);
+            border-radius: 2px;
+        }
+
+        /* Robot Building Process */
+        .process-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .process-card {
+            background: rgba(255, 255, 255, 0.95);
+            border: 2px solid rgba(255, 215, 0, 0.4);
+            border-radius: 20px;
+            padding: 2rem;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.4s ease;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.1);
+        }
+
+        .process-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 215, 0, 0.15), transparent);
+            transition: left 0.6s ease;
+        }
+
+        .process-card:hover::before {
+            left: 100%;
+        }
+
+        .process-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            border-color: var(--primary);
+            box-shadow: 0 15px 40px rgba(255, 215, 0, 0.3);
+        }
+
+        .step-number {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 3rem;
+            font-weight: 900;
+            background: var(--gradient-2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 1rem;
+        }
+
+        .process-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: var(--accent);
+        }
+
+        .process-card p {
+            font-size: 1.1rem;
+            color: var(--text-dark);
+            line-height: 1.8;
+        }
+
+        /* Robot Types */
+        .robot-types {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .robot-card {
+            background: rgba(255, 255, 255, 0.95);
+            border: 2px solid rgba(255, 215, 0, 0.5);
+            border-radius: 20px;
+            padding: 2rem;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.4s ease;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.1);
+        }
+
+        .robot-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--gradient-tech);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+            z-index: -1;
+        }
+
+        .robot-card:hover::before {
+            opacity: 0.15;
+        }
+
+        .robot-card:hover {
+            border-color: var(--accent);
+            transform: scale(1.05);
+            box-shadow: 0 15px 50px rgba(255, 165, 0, 0.3);
+        }
+
+        .robot-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            display: block;
+            animation: bounce 2s ease-in-out infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .robot-card h3 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.8rem;
+            margin-bottom: 1rem;
+            color: var(--accent);
+        }
+
+        .robot-card ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .robot-card li {
+            padding: 0.5rem 0;
+            padding-left: 1.5rem;
+            position: relative;
+            font-size: 1.05rem;
+        }
+
+        .robot-card li::before {
+            content: '▸';
+            position: absolute;
+            left: 0;
+            color: var(--accent);
+            font-weight: bold;
+        }
+
+        /* Components Section */
+        .components-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-top: 3rem;
+        }
+
+        .component-item {
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.1), rgba(255, 237, 78, 0.1));
+            border-left: 4px solid var(--accent);
+            padding: 1.5rem;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .component-item:hover {
+            border-left-color: var(--primary);
+            transform: translateX(10px);
+            box-shadow: -5px 5px 20px rgba(255, 165, 0, 0.2);
+        }
+
+        .component-item h4 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.3rem;
+            margin-bottom: 0.5rem;
+            color: var(--accent);
+        }
+
+        .component-item p {
+            font-size: 1rem;
+            color: var(--text-dark);
+        }
+
+        /* Features Section */
+        .features-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .feature-box {
+            background: rgba(255, 255, 255, 0.95);
+            border: 2px solid rgba(255, 215, 0, 0.5);
+            border-radius: 15px;
+            padding: 2rem;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.1);
+        }
+
+        .feature-box::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: conic-gradient(from 0deg, transparent, var(--accent), transparent 30%);
+            animation: rotate 4s linear infinite;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .feature-box:hover::after {
+            opacity: 0.15;
+        }
+
+        .feature-box h3 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.6rem;
+            margin-bottom: 1rem;
+            color: var(--accent);
+            position: relative;
+            z-index: 1;
+        }
+
+        .feature-box p {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            position: relative;
+            z-index: 1;
+            color: var(--text-dark);
+        }
+
+        /* Footer */
+        footer {
+            background: rgba(255, 255, 255, 0.98);
+            padding: 3rem 2rem;
+            text-align: center;
+            border-top: 3px solid var(--primary);
+            margin-top: 4rem;
+            box-shadow: 0 -4px 20px rgba(255, 215, 0, 0.1);
+        }
+
+        footer p {
+            font-size: 1.1rem;
+            color: var(--text-dark);
+        }
+
+        .footer-links {
+            margin-top: 1rem;
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .footer-links a {
+            color: var(--accent);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+
+        .footer-links a:hover {
+            color: var(--primary);
+            transform: scale(1.1);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .hero p {
+                font-size: 1.2rem;
+            }
+
+            .section-title {
+                font-size: 2rem;
+            }
+
+            .nav-links {
+                gap: 1rem;
+            }
+
+            .process-grid,
+            .robot-types,
+            .components-grid,
+            .features-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Scroll Animation */
+        .fade-in {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s ease;
+        }
+
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-animation"></div>
+
+    <header>
+        <nav>
+            <div class="logo">🤖 ROBOTICS</div>
+            <ul class="nav-links">
+                <li><a href="#home">Home</a></li>
+                <li><a href="#process">How Robots Are Built</a></li>
+                <li><a href="#types">Types</a></li>
+                <li><a href="#components">Components</a></li>
+                <li><a href="#features">Features</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <section class="hero" id="home">
+        <div class="container">
+            <h1>The Amazing World of Robotics</h1>
+            <p>Discover How Robots Are Built and What They Can Do!</p>
+        </div>
+    </section>
+
+    <section id="process">
+        <div class="container">
+            <h2 class="section-title">How Are Robots Built? 🔧</h2>
+            <div class="process-grid">
+                <div class="process-card fade-in">
+                    <div class="step-number">01</div>
+                    <h3>Design & Planning</h3>
+                    <p>First, the robot's design is created. Engineers decide what the robot will do, its size, and shape. A 3D model is created using CAD software.</p>
+                </div>
+
+                <div class="process-card fade-in">
+                    <div class="step-number">02</div>
+                    <h3>Mechanical Structure</h3>
+                    <p>The robot's body is built from metal, plastic, or carbon fiber. Joints, gears, and motors are installed to enable movement and functionality.</p>
+                </div>
+
+                <div class="process-card fade-in">
+                    <div class="step-number">03</div>
+                    <h3>Electronics Assembly</h3>
+                    <p>Microcontrollers (Arduino, Raspberry Pi), sensors, motors, and wires are connected. This forms the robot's nervous system that sends signals.</p>
+                </div>
+
+                <div class="process-card fade-in">
+                    <div class="step-number">04</div>
+                    <h3>Programming</h3>
+                    <p>The robot is programmed using Python, C++, or Arduino code. Instructions are written to tell the robot what to do in different situations.</p>
+                </div>
+
+                <div class="process-card fade-in">
+                    <div class="step-number">05</div>
+                    <h3>Power System</h3>
+                    <p>Batteries and power management circuits are installed. Solar panels can also be used for renewable energy sources.</p>
+                </div>
+
+                <div class="process-card fade-in">
+                    <div class="step-number">06</div>
+                    <h3>Testing & Debugging</h3>
+                    <p>The robot is tested, errors are found and fixed. Improvements are made repeatedly until the robot works perfectly.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="types" style="background: rgba(255, 255, 255, 0.5);">
+        <div class="container">
+            <h2 class="section-title">Types of Robots 🤖</h2>
+            <div class="robot-types">
+                <div class="robot-card fade-in">
+                    <span class="robot-icon">🦾</span>
+                    <h3>Industrial Robots</h3>
+                    <ul>
+                        <li>Used in factories and manufacturing</li>
+                        <li>Perform welding, painting, assembly</li>
+                        <li>High precision work capabilities</li>
+                        <li>Can work 24/7 without breaks</li>
+                        <li>Examples: FANUC, ABB robots</li>
+                    </ul>
+                </div>
+
+                <div class="robot-card fade-in">
+                    <span class="robot-icon">🚗</span>
+                    <h3>Mobile Robots</h3>
+                    <ul>
+                        <li>Move from one place to another</li>
+                        <li>Delivery robots, warehouse robots</li>
+                        <li>Use GPS and sensors for navigation</li>
+                        <li>Self-driving cars fall in this category</li>
+                        <li>Examples: Roomba, Tesla Autopilot</li>
+                    </ul>
+                </div>
+
+                <div class="robot-card fade-in">
+                    <span class="robot-icon">🏥</span>
+                    <h3>Medical Robots</h3>
+                    <ul>
+                        <li>Assist in surgical procedures</li>
+                        <li>Extremely precise operations</li>
+                        <li>Reduce patient recovery time</li>
+                        <li>Enable remote surgery capabilities</li>
+                        <li>Examples: Da Vinci Surgical System</li>
+                    </ul>
+                </div>
+
+                <div class="robot-card fade-in">
+                    <span class="robot-icon">🚀</span>
+                    <h3>Space Robots</h3>
+                    <ul>
+                        <li>Designed for space exploration</li>
+                        <li>Work in extreme conditions</li>
+                        <li>Explore satellites and planets</li>
+                        <li>Autonomous navigation systems</li>
+                        <li>Examples: Mars Rover, Robonaut</li>
+                    </ul>
+                </div>
+
+                <div class="robot-card fade-in">
+                    <span class="robot-icon">🏠</span>
+                    <h3>Domestic Robots</h3>
+                    <ul>
+                        <li>Used in homes for daily tasks</li>
+                        <li>Help with cleaning and cooking</li>
+                        <li>Smart home integration features</li>
+                        <li>Understand voice commands</li>
+                        <li>Examples: Roomba, Alexa with robotics</li>
+                    </ul>
+                </div>
+
+                <div class="robot-card fade-in">
+                    <span class="robot-icon">🤝</span>
+                    <h3>Humanoid Robots</h3>
+                    <ul>
+                        <li>Look and act like humans</li>
+                        <li>Can walk, talk, and gesture</li>
+                        <li>Powered by AI and machine learning</li>
+                        <li>Used for customer service, entertainment</li>
+                        <li>Examples: Sophia, Atlas</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="components">
+        <div class="container">
+            <h2 class="section-title">Main Robot Components ⚙️</h2>
+            <div class="components-grid">
+                <div class="component-item fade-in">
+                    <h4>🧠 Microcontroller/Processor</h4>
+                    <p>The robot's brain - Arduino, Raspberry Pi, or custom chips. Makes all the decisions.</p>
+                </div>
+
+                <div class="component-item fade-in">
+                    <h4>👁️ Sensors</h4>
+                    <p>Sense the environment - ultrasonic, infrared, camera, temperature, pressure sensors.</p>
+                </div>
+
+                <div class="component-item fade-in">
+                    <h4>⚡ Motors & Actuators</h4>
+                    <p>Provide movement - DC motors, servo motors, stepper motors, hydraulic actuators.</p>
+                </div>
+
+                <div class="component-item fade-in">
+                    <h4>🔋 Power Supply</h4>
+                    <p>Energy source - lithium batteries, solar panels, or wired power connections.</p>
+                </div>
+
+                <div class="component-item fade-in">
+                    <h4>🔗 Mechanical Parts</h4>
+                    <p>Physical structure - gears, wheels, joints, chassis, arms, grippers.</p>
+                </div>
+
+                <div class="component-item fade-in">
+                    <h4>📡 Communication Module</h4>
+                    <p>For data transfer - WiFi, Bluetooth, RF modules, GPS.</p>
+                </div>
+
+                <div class="component-item fade-in">
+                    <h4>💾 Memory/Storage</h4>
+                    <p>Store data and programs - SD cards, EEPROM, cloud storage.</p>
+                </div>
+
+                <div class="component-item fade-in">
+                    <h4>🎮 Control Interface</h4>
+                    <p>Remote control via mobile app or computer - joysticks, buttons, touchscreen.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="features" style="background: rgba(255, 255, 255, 0.5);">
+        <div class="container">
+            <h2 class="section-title">Amazing Robot Features & Uses 🌟</h2>
+            <div class="features-container">
+                <div class="feature-box fade-in">
+                    <h3>🎯 Precision & Accuracy</h3>
+                    <p>Robots are extremely precise. They can perform micro-level tasks that are difficult for humans. This is crucial in surgery and manufacturing.</p>
+                </div>
+
+                <div class="feature-box fade-in">
+                    <h3>💪 Strength & Endurance</h3>
+                    <p>Can perform heavy lifting and continuous work without fatigue. Work 24/7 without breaks. Operate in dangerous environments safely.</p>
+                </div>
+
+                <div class="feature-box fade-in">
+                    <h3>🧮 Data Processing</h3>
+                    <p>Process large amounts of data quickly. Improve continuously through machine learning. Create patterns and predictions.</p>
+                </div>
+
+                <div class="feature-box fade-in">
+                    <h3>🌐 Connectivity</h3>
+                    <p>Stay connected to the internet. Use cloud computing. Multiple robots can coordinate together. Remote control and monitoring possible.</p>
+                </div>
+
+                <div class="feature-box fade-in">
+                    <h3>🔐 Safety Features</h3>
+                    <p>Built-in emergency stop buttons, collision detection, and safety protocols. Can work safely alongside humans.</p>
+                </div>
+
+                <div class="feature-box fade-in">
+                    <h3>🎓 Learning Ability</h3>
+                    <p>Modern robots equipped with AI and ML can learn. Improve from experience. Automatically adapt to new tasks.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <div class="container">
+            <h2 class="section-title">What Do You Need to Build a Robot? 🛠️</h2>
+            <div class="features-container">
+                <div class="feature-box fade-in">
+                    <h3>📚 Knowledge & Skills</h3>
+                    <p><strong>Electronics:</strong> Circuits, components, soldering<br>
+                    <strong>Programming:</strong> Python, C++, Arduino<br>
+                    <strong>Mechanical:</strong> CAD design, 3D printing<br>
+                    <strong>Mathematics:</strong> Physics, calculus, algorithms</p>
+                </div>
+
+                <div class="feature-box fade-in">
+                    <h3>🔧 Tools & Equipment</h3>
+                    <p><strong>Hardware:</strong> Soldering iron, multimeter, screwdrivers<br>
+                    <strong>Software:</strong> Arduino IDE, CAD software, Python IDE<br>
+                    <strong>Machines:</strong> 3D printer (optional), laser cutter<br>
+                    <strong>Testing:</strong> Oscilloscope, power supply</p>
+                </div>
+
+                <div class="feature-box fade-in">
+                    <h3>💰 Budget & Materials</h3>
+                    <p><strong>Beginner:</strong> $100-200 (simple robots)<br>
+                    <strong>Intermediate:</strong> $200-600<br>
+                    <strong>Advanced:</strong> $600+ (complex projects)<br>
+                    <strong>Tip:</strong> Start small, reuse parts, join communities</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2026 Robotics Guide - How Robots Are Built</p>
+            <p style="margin-top: 1rem; font-size: 1rem; opacity: 0.8;">Robots around the world are helping humanity! 🌍🤖</p>
+            <div class="footer-links">
+                <a href="#home">Home</a>
+                <a href="#process">Process</a>
+                <a href="#types">Types</a>
+                <a href="#components">Components</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Scroll Animation
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver(function(entries) {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.fade-in').forEach(el => {
+            observer.observe(el);
+        });
+
+        // Smooth Scrolling
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Add parallax effect to background
+        window.addEventListener('scroll', () => {
+            const scrolled = window.pageYOffset;
+            const bg = document.querySelector('.bg-animation');
+            bg.style.transform = `translateY(${scrolled * 0.5}px)`;
+        });
+    </script>
+</body>
+</html>
