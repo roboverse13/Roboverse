@@ -1,16 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <link rel="icon" type="image/x-icon" href="favicon.ico">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RoboBuilder - Complete Robotics Platform</title>
+    <title>RoboBuilder Pro - Design Your Robot</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary: #ffd700;
-            --secondary: #ffed4e;
-            --accent: #ffa500;
+            --primary: #B8860B;
+            --secondary: #DAA520;
+            --accent: #FFD700;
             --dark: #1a1a1a;
             --darker: #0d0d0d;
             --light: #2d2d2d;
@@ -18,9 +17,7 @@
             --text-dark: #1a1a1a;
             --success: #4CAF50;
             --danger: #f44336;
-            --gradient-1: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
-            --gradient-2: linear-gradient(135deg, #ffed4e 0%, #ffa500 100%);
-            --gradient-tech: linear-gradient(45deg, #ffd700, #ffed4e, #ffa500);
+            --gradient-tech: linear-gradient(45deg, #B8860B, #DAA520, #FFD700);
         }
 
         * {
@@ -37,7 +34,6 @@
             line-height: 1.6;
         }
 
-        /* Dark Mode */
         body.dark-mode {
             background: var(--darker);
             color: #ffffff;
@@ -48,23 +44,36 @@
             border-bottom-color: var(--primary);
         }
 
-        body.dark-mode .nav-links a {
-            color: #ffffff;
-        }
-
+        body.dark-mode .card,
+        body.dark-mode .designer-panel,
+        body.dark-mode .component-card,
         body.dark-mode .modal-content {
             background: var(--light);
             color: #ffffff;
         }
 
-        body.dark-mode .card,
-        body.dark-mode .blog-card,
-        body.dark-mode .product-card {
-            background: var(--light);
-            color: #ffffff;
+        /* Animations */
+        @keyframes glow {
+            0%, 100% { filter: drop-shadow(0 0 10px var(--primary)); }
+            50% { filter: drop-shadow(0 0 20px var(--secondary)); }
         }
 
-        /* Animated Background */
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0); }
+            50% { transform: translate(0, -20px); }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        /* Background Animation */
         .bg-animation {
             position: fixed;
             top: 0;
@@ -80,12 +89,6 @@
             animation: float 20s ease-in-out infinite;
         }
 
-        @keyframes float {
-            0%, 100% { transform: translate(0, 0) scale(1); }
-            33% { transform: translate(50px, -50px) scale(1.1); }
-            66% { transform: translate(-50px, 50px) scale(0.9); }
-        }
-
         /* Header */
         header {
             background: rgba(255, 255, 255, 0.98);
@@ -95,7 +98,7 @@
             top: 0;
             z-index: 1000;
             border-bottom: 3px solid var(--primary);
-            box-shadow: 0 4px 20px rgba(255, 215, 0, 0.2);
+            box-shadow: 0 4px 20px rgba(184, 134, 11, 0.2);
         }
 
         nav {
@@ -120,56 +123,14 @@
             cursor: pointer;
         }
 
-        @keyframes glow {
-            0%, 100% { filter: drop-shadow(0 0 10px var(--primary)); }
-            50% { filter: drop-shadow(0 0 20px var(--secondary)); }
-        }
-
-        .nav-links {
-            display: flex;
-            gap: 2rem;
-            list-style: none;
-            flex-wrap: wrap;
-            align-items: center;
-        }
-
-        .nav-links a {
-            color: var(--text-dark);
-            text-decoration: none;
-            font-weight: 600;
-            font-size: 1.1rem;
-            transition: all 0.3s ease;
-            position: relative;
-            cursor: pointer;
-        }
-
-        .nav-links a::after {
-            content: '';
-            position: absolute;
-            bottom: -5px;
-            left: 0;
-            width: 0;
-            height: 2px;
-            background: var(--accent);
-            transition: width 0.3s ease;
-        }
-
-        .nav-links a:hover::after {
-            width: 100%;
-        }
-
-        .nav-links a:hover {
-            color: var(--accent);
-            transform: translateY(-2px);
-        }
-
         .nav-controls {
             display: flex;
             gap: 1rem;
             align-items: center;
+            flex-wrap: wrap;
         }
 
-        .theme-toggle, .search-toggle {
+        .icon-btn {
             background: var(--gradient-tech);
             color: var(--dark);
             border: none;
@@ -179,278 +140,470 @@
             font-size: 1rem;
             cursor: pointer;
             transition: all 0.3s ease;
+            position: relative;
         }
 
-        .theme-toggle:hover, .search-toggle:hover {
+        .icon-btn:hover {
             transform: translateY(-3px);
-            box-shadow: 0 6px 25px rgba(255, 215, 0, 0.5);
+            box-shadow: 0 6px 25px rgba(184, 134, 11, 0.5);
         }
 
-        /* Search Bar */
-        .search-container {
-            position: relative;
-            width: 300px;
-            margin: 1rem auto;
-            display: none;
-        }
-
-        .search-container.active {
-            display: block;
-        }
-
-        .search-input {
-            width: 100%;
-            padding: 0.8rem 1.5rem;
-            border: 2px solid var(--primary);
-            border-radius: 25px;
-            font-size: 1rem;
-            font-family: 'Rajdhani', sans-serif;
-        }
-
-        .search-results {
+        .badge {
             position: absolute;
-            top: 100%;
-            left: 0;
-            right: 0;
-            background: white;
-            border: 2px solid var(--primary);
-            border-top: none;
-            border-radius: 0 0 25px 25px;
-            max-height: 300px;
-            overflow-y: auto;
-            z-index: 100;
-        }
-
-        body.dark-mode .search-results {
-            background: var(--light);
-            color: #ffffff;
-        }
-
-        .search-result-item {
-            padding: 1rem;
-            border-bottom: 1px solid var(--primary);
-            cursor: pointer;
-            transition: background 0.3s ease;
-        }
-
-        .search-result-item:hover {
-            background: rgba(255, 215, 0, 0.1);
-        }
-
-        /* Tabs */
-        .tabs {
-            display: flex;
-            gap: 1rem;
-            border-bottom: 2px solid var(--primary);
-            margin-bottom: 2rem;
-            flex-wrap: wrap;
-        }
-
-        .tab-btn {
-            background: none;
-            border: none;
-            padding: 1rem 2rem;
-            font-size: 1.1rem;
-            font-weight: 600;
-            color: var(--text-dark);
-            cursor: pointer;
-            position: relative;
-            transition: all 0.3s ease;
-            font-family: 'Rajdhani', sans-serif;
-        }
-
-        body.dark-mode .tab-btn {
-            color: #ffffff;
-        }
-
-        .tab-btn.active {
-            color: var(--accent);
-        }
-
-        .tab-btn.active::after {
-            content: '';
-            position: absolute;
-            bottom: -2px;
-            left: 0;
-            right: 0;
-            height: 2px;
-            background: var(--accent);
-        }
-
-        .tab-content {
-            display: none;
-        }
-
-        .tab-content.active {
-            display: block;
-        }
-
-        /* Cards */
-        .card {
-            background: white;
-            border-radius: 15px;
-            padding: 2rem;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-            transition: all 0.3s ease;
-        }
-
-        .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 25px rgba(255, 215, 0, 0.2);
-        }
-
-        .cards-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 2rem;
-            margin: 2rem 0;
-        }
-
-        /* Blog Cards */
-        .blog-card {
-            background: white;
-            border-radius: 10px;
-            overflow: hidden;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-            transition: all 0.3s ease;
-        }
-
-        .blog-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 25px rgba(255, 215, 0, 0.2);
-        }
-
-        .blog-card-image {
-            width: 100%;
-            height: 200px;
-            background: var(--gradient-tech);
+            top: -5px;
+            right: -5px;
+            background: var(--danger);
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 3rem;
+            font-size: 0.7rem;
+            font-weight: bold;
         }
 
-        .blog-card-content {
-            padding: 1.5rem;
-        }
-
-        .blog-card h3 {
-            margin-bottom: 0.5rem;
-            color: var(--accent);
-        }
-
-        .blog-card .date {
-            font-size: 0.9rem;
-            color: #999;
-            margin-bottom: 0.5rem;
-        }
-
-        .blog-card p {
-            font-size: 0.95rem;
-            line-height: 1.5;
-        }
-
-        .read-more {
-            display: inline-block;
-            margin-top: 1rem;
-            color: var(--accent);
-            text-decoration: none;
-            font-weight: 600;
-            transition: all 0.3s ease;
-        }
-
-        .read-more:hover {
-            transform: translateX(5px);
-        }
-
-        /* Product Card */
-        .product-card {
-            background: white;
-            border-radius: 15px;
-            overflow: hidden;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-            transition: all 0.3s ease;
-        }
-
-        .product-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 25px rgba(255, 215, 0, 0.2);
-        }
-
-        .product-image {
-            width: 100%;
-            height: 150px;
-            background: var(--gradient-2);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 2rem;
-        }
-
-        .product-info {
-            padding: 1.5rem;
-        }
-
-        .product-name {
-            font-weight: 700;
-            margin-bottom: 0.5rem;
-        }
-
-        .product-price {
-            font-size: 1.5rem;
-            color: var(--accent);
-            font-weight: 700;
-            margin-bottom: 0.5rem;
-        }
-
-        .product-rating {
-            color: #ffc107;
-            font-size: 0.9rem;
-            margin-bottom: 0.5rem;
-        }
-
-        .add-to-cart {
-            width: 100%;
-            padding: 0.7rem;
-            background: var(--gradient-tech);
-            color: var(--dark);
-            border: none;
-            border-radius: 25px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .add-to-cart:hover {
-            transform: scale(1.05);
-        }
-
-        /* Sections */
-        .section {
+        /* Main Container */
+        .container {
             max-width: 1400px;
-            margin: 4rem auto;
-            padding: 0 2rem;
+            margin: 0 auto;
+            padding: 2rem;
         }
 
-        .section-title {
+        /* Hero Section */
+        .hero {
+            background: var(--gradient-tech);
+            padding: 4rem 2rem;
+            border-radius: 30px;
+            text-align: center;
+            margin: 2rem 0;
+            box-shadow: 0 10px 40px rgba(184, 134, 11, 0.3);
+            animation: fadeIn 0.6s ease;
+        }
+
+        .hero h1 {
             font-family: 'Orbitron', sans-serif;
+            font-size: 3rem;
+            color: white;
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .hero p {
+            font-size: 1.3rem;
+            color: white;
+            margin-bottom: 2rem;
+        }
+
+        .btn-primary {
+            background: white;
+            color: var(--primary);
+            border: none;
+            padding: 1rem 2.5rem;
+            border-radius: 30px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+        }
+
+        /* Stats */
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            margin: 3rem 0;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+
+        body.dark-mode .stat-card {
+            background: var(--light);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-number {
             font-size: 2.5rem;
             font-weight: 900;
-            margin-bottom: 1rem;
             background: var(--gradient-tech);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
         }
 
-        .section-subtitle {
+        .stat-label {
+            margin-top: 0.5rem;
             font-size: 1.1rem;
-            color: #666;
+        }
+
+        /* Robot Designer Section */
+        .designer-section {
+            margin: 3rem 0;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 2.5rem;
+            font-weight: 900;
+            background: var(--gradient-tech);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
             margin-bottom: 2rem;
         }
 
-        body.dark-mode .section-subtitle {
-            color: #aaa;
+        .designer-container {
+            display: grid;
+            grid-template-columns: 300px 1fr 300px;
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+
+        @media (max-width: 1024px) {
+            .designer-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .designer-panel {
+            background: white;
+            border-radius: 20px;
+            padding: 1.5rem;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+
+        .panel-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--primary);
+        }
+
+        /* Components */
+        .components-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .component-card {
+            background: rgba(184, 134, 11, 0.1);
+            padding: 1rem;
+            border-radius: 15px;
+            text-align: center;
+            cursor: grab;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .component-card:hover {
+            border-color: var(--primary);
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(184, 134, 11, 0.3);
+        }
+
+        .component-card:active {
+            cursor: grabbing;
+        }
+
+        .component-icon {
+            font-size: 3rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .component-name {
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        /* Canvas */
+        .robot-canvas {
+            background: white;
+            border-radius: 20px;
+            min-height: 600px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border: 3px dashed var(--primary);
+            position: relative;
+            overflow: hidden;
+            box-shadow: inset 0 0 30px rgba(184, 134, 11, 0.1);
+        }
+
+        body.dark-mode .robot-canvas {
+            background: var(--light);
+        }
+
+        .canvas-placeholder {
+            text-align: center;
+            color: var(--primary);
+        }
+
+        .canvas-placeholder h3 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .robot-parts {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+        }
+
+        .robot-part {
+            font-size: 4rem;
+            cursor: move;
+            transition: all 0.3s ease;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        .robot-part:hover {
+            transform: scale(1.1);
+        }
+
+        /* Properties Panel */
+        .property-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .property-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .property-input {
+            width: 100%;
+            padding: 0.8rem;
+            border: 2px solid var(--primary);
+            border-radius: 10px;
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 1rem;
+        }
+
+        .color-options {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0.5rem;
+        }
+
+        .color-option {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 3px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .color-option:hover {
+            border-color: var(--primary);
+            transform: scale(1.1);
+        }
+
+        .color-option.active {
+            border-color: var(--primary);
+            box-shadow: 0 0 15px var(--primary);
+        }
+
+        .action-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .action-btn {
+            padding: 1rem;
+            border: none;
+            border-radius: 15px;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-save {
+            background: var(--success);
+            color: white;
+        }
+
+        .btn-export {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-clear {
+            background: var(--danger);
+            color: white;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        /* Saved Designs */
+        .saved-designs {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .design-card {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            text-align: center;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        body.dark-mode .design-card {
+            background: var(--light);
+        }
+
+        .design-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(184, 134, 11, 0.3);
+        }
+
+        .design-preview {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+
+        .design-name {
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .design-date {
+            font-size: 0.85rem;
+            color: var(--primary);
+        }
+
+        /* Chatbot */
+        .chatbot {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1500;
+        }
+
+        .chat-toggle {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: var(--gradient-tech);
+            border: none;
+            color: white;
+            font-size: 2rem;
+            cursor: pointer;
+            box-shadow: 0 5px 20px rgba(184, 134, 11, 0.5);
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        .chat-window {
+            display: none;
+            position: absolute;
+            bottom: 80px;
+            right: 0;
+            width: 350px;
+            height: 500px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            flex-direction: column;
+        }
+
+        body.dark-mode .chat-window {
+            background: var(--light);
+        }
+
+        .chat-window.active {
+            display: flex;
+        }
+
+        .chat-header {
+            background: var(--gradient-tech);
+            color: white;
+            padding: 1rem;
+            border-radius: 20px 20px 0 0;
+            font-weight: 700;
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 1rem;
+            overflow-y: auto;
+        }
+
+        .message {
+            padding: 0.8rem 1rem;
+            border-radius: 15px;
+            margin-bottom: 0.5rem;
+            max-width: 80%;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .message.user {
+            background: var(--primary);
+            color: white;
+            margin-left: auto;
+        }
+
+        .message.bot {
+            background: rgba(184, 134, 11, 0.1);
+        }
+
+        .chat-input-container {
+            display: flex;
+            gap: 0.5rem;
+            padding: 1rem;
+            border-top: 2px solid rgba(184, 134, 11, 0.2);
+        }
+
+        .chat-input {
+            flex: 1;
+            padding: 0.8rem;
+            border: 2px solid var(--primary);
+            border-radius: 15px;
+            font-size: 0.9rem;
+        }
+
+        .send-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 15px;
+            cursor: pointer;
+            font-weight: 700;
         }
 
         /* Modal */
@@ -461,8 +614,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.7);
-            backdrop-filter: blur(5px);
+            background: rgba(0,0,0,0.7);
             z-index: 2000;
             align-items: center;
             justify-content: center;
@@ -474,596 +626,46 @@
 
         .modal-content {
             background: white;
-            padding: 3rem;
+            padding: 2rem;
             border-radius: 20px;
             max-width: 600px;
             width: 90%;
-            position: relative;
-            border: 3px solid var(--primary);
-            box-shadow: 0 20px 60px rgba(255, 215, 0, 0.3);
-            max-height: 90vh;
+            max-height: 80vh;
             overflow-y: auto;
+            position: relative;
+            animation: fadeIn 0.3s ease;
         }
 
-        .close-modal {
+        .modal-close {
             position: absolute;
             top: 1rem;
             right: 1rem;
-            background: none;
-            border: none;
-            font-size: 2rem;
-            cursor: pointer;
-            color: var(--text-dark);
-            transition: all 0.3s ease;
-        }
-
-        .close-modal:hover {
-            color: var(--accent);
-        }
-
-        body.dark-mode .close-modal {
-            color: #ffffff;
-        }
-
-        /* Form */
-        .form-group {
-            margin-bottom: 1.5rem;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 0.5rem;
-            font-weight: 600;
-        }
-
-        .form-group input,
-        .form-group textarea,
-        .form-group select {
-            width: 100%;
-            padding: 0.8rem;
-            border: 2px solid var(--primary);
-            border-radius: 10px;
-            font-family: 'Rajdhani', sans-serif;
-            font-size: 1rem;
-        }
-
-        body.dark-mode .form-group input,
-        body.dark-mode .form-group textarea,
-        body.dark-mode .form-group select {
-            background: var(--light);
-            color: #ffffff;
-            border-color: var(--primary);
-        }
-
-        .form-group input:focus,
-        .form-group textarea:focus,
-        .form-group select:focus {
-            outline: none;
-            border-color: var(--accent);
-            box-shadow: 0 0 10px rgba(255, 165, 0, 0.3);
-        }
-
-        .btn-primary {
-            background: var(--gradient-tech);
-            color: var(--dark);
-            border: none;
-            padding: 0.8rem 2rem;
-            border-radius: 25px;
-            font-weight: 700;
-            font-size: 1rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-family: 'Rajdhani', sans-serif;
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 6px 25px rgba(255, 215, 0, 0.5);
-        }
-
-        /* Project Gallery */
-        .project-item {
-            position: relative;
-            overflow: hidden;
-            border-radius: 15px;
-            aspect-ratio: 1;
-            cursor: pointer;
-        }
-
-        .project-image {
-            width: 100%;
-            height: 100%;
-            background: var(--gradient-tech);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 3rem;
-            transition: all 0.3s ease;
-        }
-
-        .project-item:hover .project-image {
-            transform: scale(1.1);
-        }
-
-        .project-overlay {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: rgba(0, 0, 0, 0.7);
+            background: var(--danger);
             color: white;
-            padding: 1.5rem;
-            transform: translateY(100%);
-            transition: all 0.3s ease;
-        }
-
-        .project-item:hover .project-overlay {
-            transform: translateY(0);
-        }
-
-        .project-overlay h3 {
-            margin-bottom: 0.5rem;
-        }
-
-        .project-author {
-            font-size: 0.9rem;
-            opacity: 0.8;
-        }
-
-        /* Filters */
-        .filter-section {
-            display: flex;
-            gap: 1rem;
-            margin-bottom: 2rem;
-            flex-wrap: wrap;
-        }
-
-        .filter-btn {
-            padding: 0.7rem 1.5rem;
-            border: 2px solid var(--primary);
-            background: transparent;
-            border-radius: 25px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            font-family: 'Rajdhani', sans-serif;
-            color: var(--text-dark);
-        }
-
-        body.dark-mode .filter-btn {
-            color: #ffffff;
-        }
-
-        .filter-btn.active {
-            background: var(--gradient-tech);
-            color: var(--dark);
-        }
-
-        .filter-btn:hover {
-            background: var(--gradient-tech);
-            color: var(--dark);
-        }
-
-        /* Forum */
-        .forum-post {
-            border-left: 4px solid var(--primary);
-            padding: 1.5rem;
-            margin-bottom: 1rem;
-            background: white;
-            border-radius: 10px;
-        }
-
-        body.dark-mode .forum-post {
-            background: var(--light);
-        }
-
-        .forum-post-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1rem;
-        }
-
-        .post-author {
-            font-weight: 700;
-        }
-
-        .post-date {
-            font-size: 0.9rem;
-            color: #999;
-        }
-
-        .post-replies {
-            display: flex;
-            gap: 2rem;
-            margin-top: 1rem;
-            font-size: 0.9rem;
-        }
-
-        .post-replies span {
-            cursor: pointer;
-            color: var(--accent);
-            transition: all 0.3s ease;
-        }
-
-        .post-replies span:hover {
-            transform: translateX(5px);
-        }
-
-        /* User Profile */
-        .profile-header {
-            display: flex;
-            gap: 2rem;
-            margin-bottom: 2rem;
-            align-items: center;
-        }
-
-        .profile-avatar {
-            width: 120px;
-            height: 120px;
-            border-radius: 50%;
-            background: var(--gradient-tech);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 3rem;
-        }
-
-        .profile-info h2 {
-            margin-bottom: 0.5rem;
-        }
-
-        .profile-stats {
-            display: flex;
-            gap: 2rem;
-            margin-top: 1rem;
-        }
-
-        .profile-stat {
-            text-align: center;
-        }
-
-        .profile-stat-number {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: var(--accent);
-        }
-
-        .profile-stat-label {
-            font-size: 0.9rem;
-            color: #666;
-        }
-
-        body.dark-mode .profile-stat-label {
-            color: #aaa;
-        }
-
-        /* Newsletter */
-        .newsletter-form {
-            display: flex;
-            gap: 1rem;
-            max-width: 500px;
-            margin: 2rem 0;
-        }
-
-        .newsletter-form input {
-            flex: 1;
-            padding: 0.8rem 1.5rem;
-            border: 2px solid var(--primary);
-            border-radius: 25px;
-            font-family: 'Rajdhani', sans-serif;
-        }
-
-        body.dark-mode .newsletter-form input {
-            background: var(--light);
-            color: #ffffff;
-        }
-
-        .newsletter-form button {
-            padding: 0.8rem 2rem;
-            background: var(--gradient-tech);
-            color: var(--dark);
             border: none;
-            border-radius: 25px;
-            font-weight: 700;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            font-size: 1.5rem;
             cursor: pointer;
-            transition: all 0.3s ease;
         }
 
-        .newsletter-form button:hover {
-            transform: translateY(-3px);
-        }
-
-        /* Chatbot */
-        .chatbot-toggle {
+        /* Toast */
+        .toast {
             position: fixed;
-            bottom: 2rem;
-            right: 2rem;
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            background: var(--gradient-tech);
-            color: var(--dark);
-            border: none;
-            font-size: 1.5rem;
-            cursor: pointer;
-            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.4);
-            z-index: 1500;
-            transition: all 0.3s ease;
-        }
-
-        .chatbot-toggle:hover {
-            transform: scale(1.1);
-            box-shadow: 0 6px 25px rgba(255, 215, 0, 0.6);
-        }
-
-        .chatbot-toggle.active {
-            transform: rotate(180deg);
-        }
-
-        .chatbot-container {
-            position: fixed;
-            bottom: 80px;
-            right: 2rem;
-            width: 400px;
-            height: 600px;
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 5px 40px rgba(0, 0, 0, 0.2);
-            display: flex;
-            flex-direction: column;
-            z-index: 1500;
-            transform: scale(0);
-            transform-origin: bottom right;
-            transition: all 0.3s ease;
-        }
-
-        body.dark-mode .chatbot-container {
-            background: var(--light);
-        }
-
-        .chatbot-container.active {
-            transform: scale(1);
-        }
-
-        .chatbot-header {
-            background: var(--gradient-tech);
-            color: var(--dark);
-            padding: 1.5rem;
-            border-radius: 20px 20px 0 0;
-            font-weight: 700;
-        }
-
-        .chatbot-messages {
-            flex: 1;
-            overflow-y: auto;
-            padding: 1.5rem;
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-        }
-
-        .message {
-            display: flex;
-            gap: 0.8rem;
-            align-items: flex-end;
-        }
-
-        .message.user {
-            justify-content: flex-end;
-        }
-
-        .message-avatar {
-            font-size: 1.5rem;
-        }
-
-        .message-content {
-            background: #f0f0f0;
-            padding: 0.8rem 1.2rem;
-            border-radius: 15px;
-            max-width: 70%;
-            word-wrap: break-word;
-        }
-
-        body.dark-mode .message-content {
-            background: var(--darker);
-            color: #ffffff;
-        }
-
-        .message.user .message-content {
-            background: var(--primary);
-            color: var(--dark);
-        }
-
-        .quick-questions {
-            padding: 1rem;
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 0.8rem;
-        }
-
-        .quick-question-btn {
-            padding: 0.8rem;
-            background: #f0f0f0;
-            border: none;
-            border-radius: 10px;
-            cursor: pointer;
-            text-align: left;
-            font-size: 0.9rem;
-            font-family: 'Rajdhani', sans-serif;
-            transition: all 0.3s ease;
-        }
-
-        body.dark-mode .quick-question-btn {
-            background: var(--darker);
-            color: #ffffff;
-        }
-
-        .quick-question-btn:hover {
-            background: var(--primary);
-            color: var(--dark);
-        }
-
-        .chatbot-input-area {
-            padding: 1.5rem;
-            border-top: 1px solid #ddd;
-            display: flex;
-            gap: 0.8rem;
-        }
-
-        body.dark-mode .chatbot-input-area {
-            border-top-color: var(--dark);
-        }
-
-        .chatbot-input-area input {
-            flex: 1;
-            padding: 0.8rem;
-            border: 1px solid var(--primary);
-            border-radius: 20px;
-            font-family: 'Rajdhani', sans-serif;
-        }
-
-        body.dark-mode .chatbot-input-area input {
-            background: var(--dark);
-            color: #ffffff;
-        }
-
-        .chatbot-input-area button {
-            padding: 0.8rem 1.5rem;
-            background: var(--gradient-tech);
-            color: var(--dark);
-            border: none;
-            border-radius: 20px;
-            cursor: pointer;
-            font-weight: 700;
-            transition: all 0.3s ease;
-        }
-
-        .chatbot-input-area button:hover {
-            transform: scale(1.05);
-        }
-
-        .typing-indicator {
-            display: flex;
-            gap: 4px;
-        }
-
-        .typing-indicator span {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: var(--primary);
-            animation: typing 1.4s infinite;
-        }
-
-        .typing-indicator span:nth-child(2) {
-            animation-delay: 0.2s;
-        }
-
-        .typing-indicator span:nth-child(3) {
-            animation-delay: 0.4s;
-        }
-
-        @keyframes typing {
-            0%, 60%, 100% { opacity: 0.5; }
-            30% { opacity: 1; }
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            .nav-links {
-                gap: 1rem;
-            }
-
-            .nav-links a {
-                font-size: 0.9rem;
-            }
-
-            .section-title {
-                font-size: 1.8rem;
-            }
-
-            .cards-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .chatbot-container {
-                width: 90%;
-                height: 500px;
-                right: 1rem;
-                bottom: 70px;
-            }
-
-            .profile-header {
-                flex-direction: column;
-                align-items: center;
-                text-align: center;
-            }
-
-            .newsletter-form {
-                flex-direction: column;
-            }
-
-            .modal-content {
-                padding: 2rem;
-            }
-        }
-
-        /* Animations */
-        .fade-in {
-            opacity: 0;
-            transform: translateY(20px);
-            transition: all 0.6s ease;
-        }
-
-        .fade-in.visible {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        .rating {
-            display: flex;
-            gap: 0.5rem;
-        }
-
-        .star {
-            cursor: pointer;
-            font-size: 1.5rem;
-            transition: all 0.3s ease;
-        }
-
-        .star:hover {
-            transform: scale(1.2);
-        }
-
-        .star.filled {
-            color: #ffc107;
-        }
-
-        /* Success Message */
-        .success-message {
+            bottom: 100px;
+            right: 20px;
             background: var(--success);
             color: white;
-            padding: 1rem 1.5rem;
-            border-radius: 10px;
-            margin-bottom: 1rem;
-            display: none;
+            padding: 1rem 2rem;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+            z-index: 3000;
+            animation: fadeIn 0.3s ease;
         }
 
-        .success-message.show {
-            display: block;
-            animation: slideIn 0.3s ease;
-        }
-
-        @keyframes slideIn {
-            from {
-                transform: translateY(-20px);
-                opacity: 0;
-            }
-            to {
-                transform: translateY(0);
-                opacity: 1;
-            }
+        .toast.error {
+            background: var(--danger);
         }
 
         /* Footer */
@@ -1072,88 +674,27 @@
             color: white;
             padding: 3rem 2rem;
             margin-top: 4rem;
-        }
-
-        .footer-content {
-            max-width: 1400px;
-            margin: 0 auto;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 2rem;
-            margin-bottom: 2rem;
-        }
-
-        .footer-section h3 {
-            margin-bottom: 1rem;
-            color: var(--primary);
-        }
-
-        .footer-section ul {
-            list-style: none;
-        }
-
-        .footer-section ul li {
-            margin-bottom: 0.5rem;
-        }
-
-        .footer-section ul li a {
-            color: #ccc;
-            text-decoration: none;
-            transition: all 0.3s ease;
-        }
-
-        .footer-section ul li a:hover {
-            color: var(--primary);
-            transform: translateX(5px);
-        }
-
-        .footer-bottom {
             text-align: center;
-            padding-top: 2rem;
-            border-top: 1px solid #444;
-            color: #999;
         }
 
-        /* Ratings Widget */
-        .ratings-container {
-            max-width: 500px;
-        }
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2rem;
+            }
 
-        .rating-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1rem;
-            background: #f5f5f5;
-            padding: 1rem;
-            border-radius: 10px;
-        }
+            .designer-container {
+                grid-template-columns: 1fr;
+            }
 
-        body.dark-mode .rating-item {
-            background: var(--light);
-        }
+            .components-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
 
-        .rating-stars {
-            display: flex;
-            gap: 0.3rem;
-        }
-
-        .rating-bar {
-            flex: 1;
-            height: 8px;
-            background: #ddd;
-            border-radius: 10px;
-            margin: 0 1rem;
-            overflow: hidden;
-        }
-
-        body.dark-mode .rating-bar {
-            background: var(--darker);
-        }
-
-        .rating-bar-fill {
-            height: 100%;
-            background: var(--primary);
+            .chat-window {
+                width: 90vw;
+                right: 5vw;
+            }
         }
     </style>
 </head>
@@ -1163,1009 +704,491 @@
     <!-- Header -->
     <header>
         <nav>
-            <div class="logo" onclick="scrollToSection('home')">🤖 RoboBuilder</div>
-            <ul class="nav-links">
-                <li><a onclick="showSection('projects')">Projects</a></li>
-                <li><a onclick="showSection('marketplace')">Marketplace</a></li>
-                <li><a onclick="showSection('guides')">Guides</a></li>
-                <li><a onclick="showSection('forum')">Forum</a></li>
-                <li><a onclick="showSection('courses')">Courses</a></li>
-                <li><a onclick="showSection('blog')">Blog</a></li>
-            </ul>
+            <div class="logo">🤖 RoboBuilder Pro</div>
             <div class="nav-controls">
-                <button class="search-toggle" onclick="toggleSearch()">🔍 Search</button>
-                <button class="theme-toggle" onclick="toggleTheme()">🌙 Dark</button>
+                <button class="icon-btn" onclick="openModal('saved')">
+                    💾 My Designs
+                    <span class="badge" id="savedBadge" style="display: none;">0</span>
+                </button>
+                <button class="icon-btn" onclick="openModal('gallery')">🖼️ Gallery</button>
+                <button class="icon-btn" onclick="openModal('tutorial')">📚 Tutorial</button>
+                <button class="icon-btn" onclick="toggleDarkMode()">
+                    <span id="themeIcon">🌙</span>
+                </button>
             </div>
         </nav>
-        <div class="search-container" id="searchContainer">
-            <input type="text" class="search-input" id="searchInput" placeholder="Search projects, guides, products...">
-            <div class="search-results" id="searchResults"></div>
-        </div>
     </header>
 
-    <!-- Home Section -->
-    <div id="home" class="section fade-in" style="margin-top: 2rem;">
-        <h1 class="section-title">Welcome to RoboBuilder</h1>
-        <p class="section-subtitle">Your complete platform for robotics learning, building, and community</p>
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 2rem; margin: 3rem 0;">
-            <div class="card" style="text-align: center;">
-                <div style="font-size: 3rem; margin-bottom: 1rem;">📚</div>
-                <h3>Learn</h3>
-                <p>Access comprehensive guides, tutorials, and courses on robotics</p>
-            </div>
-            <div class="card" style="text-align: center;">
-                <div style="font-size: 3rem; margin-bottom: 1rem;">🛠️</div>
-                <h3>Build</h3>
-                <p>Get all components and tools you need from our marketplace</p>
-            </div>
-            <div class="card" style="text-align: center;">
-                <div style="font-size: 3rem; margin-bottom: 1rem;">👥</div>
-                <h3>Connect</h3>
-                <p>Join thousands of robotics enthusiasts in our community</p>
-            </div>
-        </div>
-    </div>
-
-    <!-- Projects Section -->
-    <div id="projects" class="section" style="display: none;">
-        <h2 class="section-title">Community Projects</h2>
-        <p class="section-subtitle">Explore amazing projects built by our community</p>
-        
-        <div class="filter-section">
-            <button class="filter-btn active" onclick="filterProjects('all')">All</button>
-            <button class="filter-btn" onclick="filterProjects('beginner')">Beginner</button>
-            <button class="filter-btn" onclick="filterProjects('intermediate')">Intermediate</button>
-            <button class="filter-btn" onclick="filterProjects('advanced')">Advanced</button>
+    <!-- Main Content -->
+    <div class="container">
+        <!-- Hero -->
+        <div class="hero">
+            <h1>🤖 Design Your Dream Robot!</h1>
+            <p>Drag & Drop Components • Customize Colors • Export Your Creation</p>
+            <button class="btn-primary" onclick="scrollToDesigner()">Start Designing 🎨</button>
         </div>
 
-        <div class="cards-grid" id="projectsGrid">
-            <!-- Projects will be generated here -->
-        </div>
-    </div>
-
-    <!-- Marketplace Section -->
-    <div id="marketplace" class="section" style="display: none;">
-        <h2 class="section-title">Robotics Marketplace</h2>
-        <p class="section-subtitle">High-quality components and tools for your projects</p>
-
-        <div class="filter-section">
-            <button class="filter-btn active" onclick="filterProducts('all')">All</button>
-            <button class="filter-btn" onclick="filterProducts('microcontroller')">Microcontrollers</button>
-            <button class="filter-btn" onclick="filterProducts('sensors')">Sensors</button>
-            <button class="filter-btn" onclick="filterProducts('motors')">Motors</button>
-            <button class="filter-btn" onclick="filterProducts('kits')">Kits</button>
-        </div>
-
-        <div class="cards-grid" id="productsGrid">
-            <!-- Products will be generated here -->
-        </div>
-    </div>
-
-    <!-- Guides Section -->
-    <div id="guides" class="section" style="display: none;">
-        <h2 class="section-title">Build Guides</h2>
-        <p class="section-subtitle">Step-by-step guides for building various robots</p>
-
-        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 2rem;">
-            <div class="card fade-in">
-                <h3>🤖 Building Your First Robot</h3>
-                <p>Learn the fundamentals of robotics with this beginner-friendly guide.</p>
-                <button class="btn-primary" onclick="openGuideModal('first-robot')">Read Guide</button>
+        <!-- Stats -->
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-number">5000+</div>
+                <div class="stat-label">Robots Created</div>
             </div>
-            <div class="card fade-in">
-                <h3>⚡ Arduino Programming Basics</h3>
-                <p>Master Arduino programming to control your robots.</p>
-                <button class="btn-primary" onclick="openGuideModal('arduino-basics')">Read Guide</button>
+            <div class="stat-card">
+                <div class="stat-number">50+</div>
+                <div class="stat-label">Components</div>
             </div>
-            <div class="card fade-in">
-                <h3>🔌 Circuit Design Fundamentals</h3>
-                <p>Understand circuit design principles for robotics.</p>
-                <button class="btn-primary" onclick="openGuideModal('circuits')">Read Guide</button>
+            <div class="stat-card">
+                <div class="stat-number">100+</div>
+                <div class="stat-label">Color Options</div>
             </div>
-            <div class="card fade-in">
-                <h3>🦾 Building a Robotic Arm</h3>
-                <p>Advanced guide to building a functional robotic arm.</p>
-                <button class="btn-primary" onclick="openGuideModal('robotic-arm')">Read Guide</button>
-            </div>
-            <div class="card fade-in">
-                <h3>🚗 Autonomous Navigation</h3>
-                <p>Learn how to make robots navigate autonomously.</p>
-                <button class="btn-primary" onclick="openGuideModal('navigation')">Read Guide</button>
-            </div>
-            <div class="card fade-in">
-                <h3>🎮 Robot Vision Systems</h3>
-                <p>Implement computer vision in your robotics projects.</p>
-                <button class="btn-primary" onclick="openGuideModal('vision')">Read Guide</button>
+            <div class="stat-card">
+                <div class="stat-number">24/7</div>
+                <div class="stat-label">AI Assistant</div>
             </div>
         </div>
-    </div>
 
-    <!-- Forum Section -->
-    <div id="forum" class="section" style="display: none;">
-        <h2 class="section-title">Community Forum</h2>
-        <p class="section-subtitle">Ask questions, share ideas, and help other builders</p>
-
-        <button class="btn-primary" onclick="openModal('forumModal')" style="margin-bottom: 2rem;">+ New Discussion</button>
-
-        <div id="forumPosts">
-            <!-- Forum posts will be generated here -->
-        </div>
-    </div>
-
-    <!-- Courses Section -->
-    <div id="courses" class="section" style="display: none;">
-        <h2 class="section-title">Online Courses</h2>
-        <p class="section-subtitle">Structured learning paths from beginner to advanced</p>
-
-        <div class="tabs" id="courseTabs">
-            <button class="tab-btn active" onclick="switchCourseTab('beginner')">Beginner</button>
-            <button class="tab-btn" onclick="switchCourseTab('intermediate')">Intermediate</button>
-            <button class="tab-btn" onclick="switchCourseTab('advanced')">Advanced</button>
-        </div>
-
-        <div id="beginner-courses" class="tab-content active">
-            <div class="cards-grid" id="beginnerCoursesGrid"></div>
-        </div>
-        <div id="intermediate-courses" class="tab-content">
-            <div class="cards-grid" id="intermediateCoursesGrid"></div>
-        </div>
-        <div id="advanced-courses" class="tab-content">
-            <div class="cards-grid" id="advancedCoursesGrid"></div>
-        </div>
-    </div>
-
-    <!-- Blog Section -->
-    <div id="blog" class="section" style="display: none;">
-        <h2 class="section-title">RoboBuilder Blog</h2>
-        <p class="section-subtitle">Latest news, tips, and insights from the robotics world</p>
-
-        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 2rem;" id="blogGrid">
-            <!-- Blog posts will be generated here -->
-        </div>
-    </div>
-
-    <!-- Project Builder Modal -->
-    <div id="projectBuilderModal" class="modal">
-        <div class="modal-content">
-            <button class="close-modal" onclick="closeModal('projectBuilderModal')">×</button>
-            <h2>Project Builder</h2>
-            <p style="margin-bottom: 2rem;">Design your robot project with our interactive builder</p>
+        <!-- Robot Designer -->
+        <div class="designer-section" id="designer">
+            <h2 class="section-title">🎨 Robot Designer Studio</h2>
             
-            <div class="form-group">
-                <label>Project Name</label>
-                <input type="text" id="projectName" placeholder="Give your project a name">
-            </div>
-
-            <div class="form-group">
-                <label>Description</label>
-                <textarea id="projectDesc" rows="4" placeholder="Describe your project..."></textarea>
-            </div>
-
-            <div class="form-group">
-                <label>Difficulty Level</label>
-                <select id="projectLevel">
-                    <option>Beginner</option>
-                    <option>Intermediate</option>
-                    <option>Advanced</option>
-                </select>
-            </div>
-
-            <div class="form-group">
-                <label>Estimated Cost</label>
-                <input type="number" id="projectCost" placeholder="$">
-            </div>
-
-            <div class="form-group">
-                <label>Components (comma-separated)</label>
-                <input type="text" id="projectComponents" placeholder="Arduino, Servo, Sensor...">
-            </div>
-
-            <button class="btn-primary" style="width: 100%;" onclick="saveProject()">Save Project</button>
-        </div>
-    </div>
-
-    <!-- Cost Calculator Modal -->
-    <div id="costCalculatorModal" class="modal">
-        <div class="modal-content">
-            <button class="close-modal" onclick="closeModal('costCalculatorModal')">×</button>
-            <h2>Project Cost Calculator</h2>
-            
-            <div id="calculatorItems">
-                <div class="form-group" style="display: flex; gap: 1rem;">
-                    <input type="text" placeholder="Component name" style="flex: 1;">
-                    <input type="number" placeholder="Price" style="flex: 1;">
-                    <button class="btn-primary" onclick="addCalculatorItem()">+</button>
-                </div>
-            </div>
-
-            <div style="margin-top: 2rem; padding: 1.5rem; background: #f5f5f5; border-radius: 10px;">
-                <div style="font-size: 1.5rem; font-weight: 700;">Total Cost: $<span id="totalCost">0</span></div>
-            </div>
-
-            <button class="btn-primary" style="width: 100%; margin-top: 1.5rem;" onclick="exportCalculation()">Export</button>
-        </div>
-    </div>
-
-    <!-- Troubleshooting Modal -->
-    <div id="troubleshootingModal" class="modal">
-        <div class="modal-content">
-            <button class="close-modal" onclick="closeModal('troubleshootingModal')">×</button>
-            <h2>Troubleshooting Guide</h2>
-            
-            <div class="form-group">
-                <label>What's the problem?</label>
-                <input type="text" id="troubleQuestion" placeholder="Describe your issue...">
-            </div>
-
-            <button class="btn-primary" onclick="getTroubleshootingHelp()" style="width: 100%; margin-bottom: 2rem;">Get Help</button>
-
-            <div id="troubleshootingResults"></div>
-        </div>
-    </div>
-
-    <!-- Forum Post Modal -->
-    <div id="forumModal" class="modal">
-        <div class="modal-content">
-            <button class="close-modal" onclick="closeModal('forumModal')">×</button>
-            <h2>Create New Discussion</h2>
-            
-            <div class="form-group">
-                <label>Title</label>
-                <input type="text" id="forumTitle" placeholder="What's your question or topic?">
-            </div>
-
-            <div class="form-group">
-                <label>Description</label>
-                <textarea id="forumDesc" rows="6" placeholder="Provide more details..."></textarea>
-            </div>
-
-            <div class="form-group">
-                <label>Category</label>
-                <select id="forumCategory">
-                    <option>General Discussion</option>
-                    <option>Help & Troubleshooting</option>
-                    <option>Project Showcase</option>
-                    <option>Techniques & Tips</option>
-                </select>
-            </div>
-
-            <button class="btn-primary" style="width: 100%;" onclick="postForum()">Post Discussion</button>
-        </div>
-    </div>
-
-    <!-- User Profile Modal -->
-    <div id="userProfileModal" class="modal">
-        <div class="modal-content">
-            <button class="close-modal" onclick="closeModal('userProfileModal')">×</button>
-            
-            <div class="profile-header">
-                <div class="profile-avatar">👤</div>
-                <div>
-                    <h2 id="profileName">John Developer</h2>
-                    <p style="color: #666; margin-bottom: 1rem;">Robotics Enthusiast & Builder</p>
-                    <div class="profile-stats">
-                        <div class="profile-stat">
-                            <div class="profile-stat-number">12</div>
-                            <div class="profile-stat-label">Projects</div>
+            <div class="designer-container">
+                <!-- Components Panel -->
+                <div class="designer-panel">
+                    <div class="panel-title">📦 Components</div>
+                    <div class="components-grid">
+                        <div class="component-card" draggable="true" ondragstart="drag(event)" data-component="🤖">
+                            <div class="component-icon">🤖</div>
+                            <div class="component-name">Head</div>
                         </div>
-                        <div class="profile-stat">
-                            <div class="profile-stat-number">45</div>
-                            <div class="profile-stat-label">Posts</div>
+                        <div class="component-card" draggable="true" ondragstart="drag(event)" data-component="👁️">
+                            <div class="component-icon">👁️</div>
+                            <div class="component-name">Eyes</div>
                         </div>
-                        <div class="profile-stat">
-                            <div class="profile-stat-number">128</div>
-                            <div class="profile-stat-label">Followers</div>
+                        <div class="component-card" draggable="true" ondragstart="drag(event)" data-component="📦">
+                            <div class="component-icon">📦</div>
+                            <div class="component-name">Body</div>
+                        </div>
+                        <div class="component-card" draggable="true" ondragstart="drag(event)" data-component="🦾">
+                            <div class="component-icon">🦾</div>
+                            <div class="component-name">Arms</div>
+                        </div>
+                        <div class="component-card" draggable="true" ondragstart="drag(event)" data-component="🦿">
+                            <div class="component-icon">🦿</div>
+                            <div class="component-name">Legs</div>
+                        </div>
+                        <div class="component-card" draggable="true" ondragstart="drag(event)" data-component="⚙️">
+                            <div class="component-icon">⚙️</div>
+                            <div class="component-name">Gears</div>
+                        </div>
+                        <div class="component-card" draggable="true" ondragstart="drag(event)" data-component="🔧">
+                            <div class="component-icon">🔧</div>
+                            <div class="component-name">Tools</div>
+                        </div>
+                        <div class="component-card" draggable="true" ondragstart="drag(event)" data-component="🔌">
+                            <div class="component-icon">🔌</div>
+                            <div class="component-name">Power</div>
+                        </div>
+                        <div class="component-card" draggable="true" ondragstart="drag(event)" data-component="📡">
+                            <div class="component-icon">📡</div>
+                            <div class="component-name">Antenna</div>
+                        </div>
+                        <div class="component-card" draggable="true" ondragstart="drag(event)" data-component="💡">
+                            <div class="component-icon">💡</div>
+                            <div class="component-name">Lights</div>
+                        </div>
+                        <div class="component-card" draggable="true" ondragstart="drag(event)" data-component="🎯">
+                            <div class="component-icon">🎯</div>
+                            <div class="component-name">Sensor</div>
+                        </div>
+                        <div class="component-card" draggable="true" ondragstart="drag(event)" data-component="🔊">
+                            <div class="component-icon">🔊</div>
+                            <div class="component-name">Speaker</div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <h3 style="margin-bottom: 1rem;">Recent Projects</h3>
-            <div id="userProjects"></div>
-
-            <button class="btn-primary" style="width: 100%; margin-top: 2rem;">Follow User</button>
-        </div>
-    </div>
-
-    <!-- Guide Modal -->
-    <div id="guideModal" class="modal">
-        <div class="modal-content">
-            <button class="close-modal" onclick="closeModal('guideModal')">×</button>
-            <h2 id="guideTitle">Guide Title</h2>
-            <p id="guideContent"></p>
-            <div id="guideBOM" style="margin-top: 2rem; background: #f5f5f5; padding: 1.5rem; border-radius: 10px; display: none;">
-                <h3 style="margin-bottom: 1rem;">Bill of Materials</h3>
-                <ul id="billOfMaterials" style="list-style-position: inside;"></ul>
-            </div>
-            <button class="btn-primary" style="width: 100%; margin-top: 2rem;">Download Full Guide (PDF)</button>
-        </div>
-    </div>
-
-    <!-- Part Comparator Modal -->
-    <div id="partComparatorModal" class="modal">
-        <div class="modal-content">
-            <button class="close-modal" onclick="closeModal('partComparatorModal')">×</button>
-            <h2>Component Comparator</h2>
-            
-            <p style="margin-bottom: 2rem;">Compare different components side by side</p>
-
-            <div style="overflow-x: auto;">
-                <table style="width: 100%; border-collapse: collapse;">
-                    <thead>
-                        <tr style="border-bottom: 2px solid var(--primary);">
-                            <th style="text-align: left; padding: 1rem;">Component</th>
-                            <th style="text-align: center; padding: 1rem;">Price</th>
-                            <th style="text-align: center; padding: 1rem;">Rating</th>
-                            <th style="text-align: center; padding: 1rem;">Stock</th>
-                        </tr>
-                    </thead>
-                    <tbody id="comparatorTable"></tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-
-    <!-- Certification Modal -->
-    <div id="certificationModal" class="modal">
-        <div class="modal-content">
-            <button class="close-modal" onclick="closeModal('certificationModal')">×</button>
-            <h2>Certification Programs</h2>
-            
-            <div class="cards-grid">
-                <div class="card">
-                    <h3>🎖️ Robotics Fundamentals</h3>
-                    <p style="margin: 1rem 0;">Learn the basics of robotics</p>
-                    <div style="margin-bottom: 1rem;">
-                        <strong>Duration:</strong> 4 weeks<br>
-                        <strong>Price:</strong> $49
+                <!-- Canvas -->
+                <div class="robot-canvas" ondrop="drop(event)" ondragover="allowDrop(event)" id="robotCanvas">
+                    <div class="canvas-placeholder" id="placeholder">
+                        <h3>👆 Drag Components Here</h3>
+                        <p>Start building your robot by dragging components from the left panel</p>
                     </div>
-                    <button class="btn-primary" style="width: 100%;">Enroll Now</button>
+                    <div class="robot-parts" id="robotParts" style="display: none;"></div>
                 </div>
-                <div class="card">
-                    <h3>🎖️ Advanced Robotics</h3>
-                    <p style="margin: 1rem 0;">Master advanced concepts</p>
-                    <div style="margin-bottom: 1rem;">
-                        <strong>Duration:</strong> 8 weeks<br>
-                        <strong>Price:</strong> $99
+
+                <!-- Properties Panel -->
+                <div class="designer-panel">
+                    <div class="panel-title">🎨 Properties</div>
+                    
+                    <div class="property-group">
+                        <label class="property-label">Robot Name:</label>
+                        <input type="text" class="property-input" id="robotName" placeholder="My Awesome Robot" value="RoboBot-X1">
                     </div>
-                    <button class="btn-primary" style="width: 100%;">Enroll Now</button>
+
+                    <div class="property-group">
+                        <label class="property-label">Robot Size:</label>
+                        <input type="range" class="property-input" id="robotSize" min="1" max="3" step="0.5" value="2" oninput="updateSize(this.value)">
+                        <div style="text-align: center; margin-top: 0.5rem;">
+                            <span id="sizeValue">Medium</span>
+                        </div>
+                    </div>
+
+                    <div class="property-group">
+                        <label class="property-label">Theme Color:</label>
+                        <div class="color-options">
+                            <div class="color-option active" style="background: #FFD700;" onclick="changeTheme('#FFD700', this)"></div>
+                            <div class="color-option" style="background: #FF6B35;" onclick="changeTheme('#FF6B35', this)"></div>
+                            <div class="color-option" style="background: #4CAF50;" onclick="changeTheme('#4CAF50', this)"></div>
+                            <div class="color-option" style="background: #2196F3;" onclick="changeTheme('#2196F3', this)"></div>
+                            <div class="color-option" style="background: #9C27B0;" onclick="changeTheme('#9C27B0', this)"></div>
+                            <div class="color-option" style="background: #FF1744;" onclick="changeTheme('#FF1744', this)"></div>
+                            <div class="color-option" style="background: #00BCD4;" onclick="changeTheme('#00BCD4', this)"></div>
+                            <div class="color-option" style="background: #FFC107;" onclick="changeTheme('#FFC107', this)"></div>
+                        </div>
+                    </div>
+
+                    <div class="action-buttons">
+                        <button class="action-btn btn-save" onclick="saveDesign()">💾 Save Design</button>
+                        <button class="action-btn btn-export" onclick="exportDesign()">📥 Export Image</button>
+                        <button class="action-btn btn-clear" onclick="clearCanvas()">🗑️ Clear Canvas</button>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
 
-    <!-- Newsletter Modal -->
-    <div id="newsletterModal" class="modal">
-        <div class="modal-content">
-            <button class="close-modal" onclick="closeModal('newsletterModal')">×</button>
-            <h2>Subscribe to Newsletter</h2>
-            <p style="margin-bottom: 2rem;">Get weekly updates on new projects, guides, and community highlights</p>
-            
-            <div class="form-group">
-                <label>Email</label>
-                <input type="email" id="newsletterEmail" placeholder="your@email.com">
-            </div>
-
-            <div style="margin-bottom: 2rem;">
-                <label style="display: flex; gap: 0.5rem; align-items: center;">
-                    <input type="checkbox" checked>
-                    <span>Send me weekly digest</span>
-                </label>
-                <label style="display: flex; gap: 0.5rem; align-items: center; margin-top: 0.5rem;">
-                    <input type="checkbox" checked>
-                    <span>Notify me about new courses</span>
-                </label>
-            </div>
-
-            <button class="btn-primary" style="width: 100%;" onclick="subscribeNewsletter()">Subscribe</button>
-        </div>
-    </div>
-
-    <!-- Rating Modal -->
-    <div id="ratingModal" class="modal">
-        <div class="modal-content">
-            <button class="close-modal" onclick="closeModal('ratingModal')">×</button>
-            <h2>Rate This Product</h2>
-            
-            <div style="margin: 2rem 0; text-align: center;">
-                <div class="rating" id="ratingStars" style="justify-content: center; gap: 1rem;">
-                    <span class="star" onclick="setRating(1)">⭐</span>
-                    <span class="star" onclick="setRating(2)">⭐</span>
-                    <span class="star" onclick="setRating(3)">⭐</span>
-                    <span class="star" onclick="setRating(4)">⭐</span>
-                    <span class="star" onclick="setRating(5)">⭐</span>
+        <!-- Saved Designs Section -->
+        <div class="designer-section">
+            <h2 class="section-title">💾 My Saved Designs</h2>
+            <div class="saved-designs" id="savedDesigns">
+                <div class="design-card">
+                    <div class="design-preview">🤖</div>
+                    <div class="design-name">Example Robot</div>
+                    <div class="design-date">Created today</div>
                 </div>
             </div>
-
-            <div class="form-group">
-                <label>Your Review</label>
-                <textarea id="reviewText" rows="5" placeholder="Share your experience..."></textarea>
-            </div>
-
-            <button class="btn-primary" style="width: 100%;" onclick="submitReview()">Submit Review</button>
         </div>
     </div>
 
     <!-- Chatbot -->
-    <button class="chatbot-toggle" id="chatbotToggle">💬</button>
-    <div class="chatbot-container" id="chatbotContainer">
-        <div class="chatbot-header">RoboBot Assistant</div>
-        <div class="chatbot-messages" id="chatbotMessages">
-            <div class="message bot">
-                <div class="message-avatar">🤖</div>
-                <div class="message-content">Hi! I'm RoboBot. How can I help you with your robotics projects today?</div>
+    <div class="chatbot">
+        <button class="chat-toggle" onclick="toggleChat()">💬</button>
+        <div class="chat-window" id="chatWindow">
+            <div class="chat-header">🤖 RoboBot Assistant</div>
+            <div class="chat-messages" id="chatMessages">
+                <div class="message bot">
+                    Hi! 👋 I'm RoboBot, your robot design assistant. Need help?
+                </div>
+                <div class="message bot">
+                    <button onclick="askBot('How to start?')" style="display: block; margin: 0.3rem 0; padding: 0.5rem; background: var(--primary); color: white; border: none; border-radius: 10px; cursor: pointer; width: 100%;">🎨 How to start designing?</button>
+                    <button onclick="askBot('Component tips')" style="display: block; margin: 0.3rem 0; padding: 0.5rem; background: var(--primary); color: white; border: none; border-radius: 10px; cursor: pointer; width: 100%;">💡 Component tips</button>
+                    <button onclick="askBot('Export help')" style="display: block; margin: 0.3rem 0; padding: 0.5rem; background: var(--primary); color: white; border: none; border-radius: 10px; cursor: pointer; width: 100%;">📥 How to export?</button>
+                </div>
             </div>
-            <div class="quick-questions">
-                <button class="quick-question-btn" data-question="How do I start with Arduino?" onclick="askQuestion(this)">How do I start with Arduino?</button>
-                <button class="quick-question-btn" data-question="What components do I need?" onclick="askQuestion(this)">What components do I need?</button>
-                <button class="quick-question-btn" data-question="How to build a robot arm?" onclick="askQuestion(this)">How to build a robot arm?</button>
-                <button class="quick-question-btn" data-question="Best beginner projects" onclick="askQuestion(this)">Best beginner projects</button>
+            <div class="chat-input-container">
+                <input type="text" class="chat-input" id="chatInput" placeholder="Ask me anything..." onkeypress="if(event.key==='Enter') sendMessage()">
+                <button class="send-btn" onclick="sendMessage()">Send</button>
             </div>
         </div>
-        <div class="chatbot-input-area">
-            <input type="text" id="chatInput" placeholder="Ask me anything...">
-            <button id="sendBtn" onclick="sendChatMessage()">Send</button>
+    </div>
+
+    <!-- Modals -->
+    <div class="modal" id="savedModal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal('saved')">×</button>
+            <h2 style="color: var(--primary); margin-bottom: 1rem;">💾 My Saved Designs</h2>
+            <div id="savedModalContent"></div>
+        </div>
+    </div>
+
+    <div class="modal" id="galleryModal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal('gallery')">×</button>
+            <h2 style="color: var(--primary); margin-bottom: 1rem;">🖼️ Community Gallery</h2>
+            <p>Discover amazing robot designs from our community!</p>
+            <div class="saved-designs" style="margin-top: 2rem;">
+                <div class="design-card"><div class="design-preview">🦾🤖🦿</div><div class="design-name">Super Bot</div></div>
+                <div class="design-card"><div class="design-preview">🎯🤖💡</div><div class="design-name">Sensor Bot</div></div>
+                <div class="design-card"><div class="design-preview">⚙️📦🔧</div><div class="design-name">Builder Bot</div></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="tutorialModal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal('tutorial')">×</button>
+            <h2 style="color: var(--primary); margin-bottom: 1rem;">📚 How to Use Robot Designer</h2>
+            <div style="line-height: 2;">
+                <h3 style="color: var(--primary); margin-top: 1rem;">Step 1: Select Components</h3>
+                <p>Drag components from the left panel (Head, Body, Arms, etc.)</p>
+                
+                <h3 style="color: var(--primary); margin-top: 1rem;">Step 2: Drop on Canvas</h3>
+                <p>Drop them on the center canvas to build your robot</p>
+                
+                <h3 style="color: var(--primary); margin-top: 1rem;">Step 3: Customize</h3>
+                <p>Use the right panel to change colors, size, and name</p>
+                
+                <h3 style="color: var(--primary); margin-top: 1rem;">Step 4: Save & Export</h3>
+                <p>Save your design or export it as an image!</p>
+            </div>
         </div>
     </div>
 
     <!-- Footer -->
     <footer>
-        <div class="footer-content">
-            <div class="footer-section">
-                <h3>🤖 RoboBuilder</h3>
-                <p>Your complete platform for robotics learning and community</p>
-                <div style="margin-top: 1rem;">
-                    <strong>Quick Links:</strong>
-                    <ul style="margin-top: 0.5rem;">
-                        <li><a onclick="openModal('projectBuilderModal')">Project Builder</a></li>
-                        <li><a onclick="openModal('costCalculatorModal')">Cost Calculator</a></li>
-                        <li><a onclick="openModal('troubleshootingModal')">Troubleshooting</a></li>
-                    </ul>
-                </div>
-            </div>
-            <div class="footer-section">
-                <h3>Learning</h3>
-                <ul>
-                    <li><a onclick="showSection('guides')">Build Guides</a></li>
-                    <li><a onclick="showSection('courses')">Courses</a></li>
-                    <li><a onclick="openModal('certificationModal')">Certifications</a></li>
-                    <li><a onclick="showSection('blog')">Blog</a></li>
-                </ul>
-            </div>
-            <div class="footer-section">
-                <h3>Community</h3>
-                <ul>
-                    <li><a onclick="showSection('projects')">Projects</a></li>
-                    <li><a onclick="showSection('forum')">Forum</a></li>
-                    <li><a onclick="openModal('userProfileModal')">User Profiles</a></li>
-                    <li><a onclick="openModal('partComparatorModal')">Component Comparator</a></li>
-                </ul>
-            </div>
-            <div class="footer-section">
-                <h3>Shop</h3>
-                <ul>
-                    <li><a onclick="showSection('marketplace')">Marketplace</a></li>
-                    <li><a onclick="openModal('ratingModal')">Rate Products</a></li>
-                    <li><a href="#">Affiliate Program</a></li>
-                    <li><a href="#">Bulk Orders</a></li>
-                </ul>
-            </div>
-            <div class="footer-section">
-                <h3>More</h3>
-                <ul>
-                    <li><a href="#">About Us</a></li>
-                    <li><a href="#">Contact</a></li>
-                    <li><a onclick="openModal('newsletterModal')">Newsletter</a></li>
-                    <li><a href="#">Privacy Policy</a></li>
-                </ul>
-            </div>
-        </div>
-        <div class="footer-bottom">
-            <p>&copy; 2024 RoboBuilder. All rights reserved. | Building the future of robotics together 🚀</p>
-        </div>
+        <p>&copy; 2026 RoboBuilder Pro. Design Your Dream Robot! 🤖</p>
+        <p style="margin-top: 1rem;">Made with ❤️ for Robot Enthusiasts</p>
     </footer>
 
     <script>
-        // Data Store
-        const data = {
-            projects: [
-                { id: 1, name: 'Smart Home Robot', level: 'intermediate', author: 'Alex Dev', image: '🤖', votes: 142 },
-                { id: 2, name: 'Line Following Robot', level: 'beginner', author: 'Bot Master', image: '🚗', votes: 89 },
-                { id: 3, name: 'Industrial Arm', level: 'advanced', author: 'Pro Builder', image: '🦾', votes: 256 },
-                { id: 4, name: 'Drone Assembly', level: 'intermediate', author: 'Sky Flyer', image: '🛸', votes: 198 },
-                { id: 5, name: 'AI Vision Bot', level: 'advanced', author: 'AI Expert', image: '👁️', votes: 312 },
-                { id: 6, name: 'Obstacle Avoider', level: 'beginner', author: 'New Maker', image: '🚙', votes: 67 },
-            ],
-            products: [
-                { id: 1, name: 'Arduino Uno', price: 24.99, rating: 4.8, category: 'microcontroller' },
-                { id: 2, name: 'Raspberry Pi 4', price: 54.99, rating: 4.9, category: 'microcontroller' },
-                { id: 3, name: 'Servo Motor', price: 8.99, rating: 4.7, category: 'motors' },
-                { id: 4, name: 'Ultrasonic Sensor', price: 5.99, rating: 4.6, category: 'sensors' },
-                { id: 5, name: 'Complete Robot Kit', price: 89.99, rating: 4.8, category: 'kits' },
-                { id: 6, name: 'Stepper Motor', price: 12.99, rating: 4.5, category: 'motors' },
-            ],
-            courses: {
-                beginner: [
-                    { title: 'Robotics Fundamentals', duration: '4 weeks', price: 29.99, students: 1240 },
-                    { title: 'Arduino Basics', duration: '3 weeks', price: 24.99, students: 2150 },
-                    { title: 'Components 101', duration: '2 weeks', price: 19.99, students: 890 },
-                ],
-                intermediate: [
-                    { title: 'Mobile Robotics', duration: '6 weeks', price: 49.99, students: 456 },
-                    { title: 'Robot Vision', duration: '5 weeks', price: 44.99, students: 320 },
-                    { title: 'AI in Robotics', duration: '7 weeks', price: 59.99, students: 280 },
-                ],
-                advanced: [
-                    { title: 'Advanced Control Systems', duration: '8 weeks', price: 79.99, students: 120 },
-                    { title: 'Robot Operating System (ROS)', duration: '8 weeks', price: 79.99, students: 95 },
-                    { title: 'Machine Learning for Robots', duration: '10 weeks', price: 99.99, students: 87 },
-                ]
-            },
-            blogs: [
-                { title: 'The Future of Robotics in 2024', date: 'Feb 8, 2024', emoji: '🚀', category: 'News' },
-                { title: '10 Best Arduino Projects for Beginners', date: 'Feb 6, 2024', emoji: '📚', category: 'Tutorial' },
-                { title: 'How AI is Revolutionizing Robot Design', date: 'Feb 4, 2024', emoji: '🤖', category: 'Technology' },
-                { title: 'DIY Robot Arm Build Guide', date: 'Feb 2, 2024', emoji: '🦾', category: 'Guide' },
-                { title: 'Sensor Integration Tips & Tricks', date: 'Jan 31, 2024', emoji: '📡', category: 'Tips' },
-                { title: 'Community Spotlight: Amazing Projects', date: 'Jan 29, 2024', emoji: '⭐', category: 'Community' },
-            ],
-            guides: {
-                'first-robot': { title: 'Building Your First Robot', content: 'This comprehensive guide will teach you the fundamentals of robotics. Start with understanding basic components like motors, sensors, and microcontrollers. Learn how to assemble them together and create your first functioning robot. By the end of this guide, you\'ll have a working line-following robot!', bom: ['Arduino Uno', 'DC Motors (2)', 'Wheels (4)', 'Chassis', 'Battery Holder', 'IR Sensors', 'Jumper Wires', 'Breadboard'] },
-                'arduino-basics': { title: 'Arduino Programming Basics', content: 'Master the fundamentals of Arduino programming. Learn about digital and analog pins, PWM signals, and how to write effective code for your robot. This guide covers setup, basic syntax, libraries, and common programming patterns used in robotics.', bom: ['Arduino IDE', 'USB Cable', 'Arduino Board'] },
-                'circuits': { title: 'Circuit Design Fundamentals', content: 'Understanding circuit design is crucial for robotics. Learn about basic circuit components, how to read circuit diagrams, and design circuits for your projects. This guide covers resistors, capacitors, transistors, and their applications in robotics.', bom: ['Multimeter', 'Breadboard', 'Resistors', 'Capacitors', 'Transistors', 'LED'] },
-                'robotic-arm': { title: 'Building a Robotic Arm', content: 'An advanced guide to building a 5-DOF robotic arm. Learn about mechanical design, servo calibration, and kinematics. This project will teach you about complex robotics concepts in a practical way.', bom: ['Servo Motors (5)', 'Aluminum Frame', 'Gripper Mechanism', 'Arduino Mega', 'Power Supply', '3D Printed Parts'] },
-                'navigation': { title: 'Autonomous Navigation', content: 'Learn how to make robots navigate autonomously without human control. This guide covers pathfinding algorithms, sensor fusion, and obstacle avoidance techniques.', bom: ['Lidar Sensor', 'IMU', 'Compass', 'Wheel Encoders', 'Motor Control Board'] },
-                'vision': { title: 'Robot Vision Systems', content: 'Implement computer vision in your robotics projects. Learn about image processing, object detection, and camera calibration. This guide uses OpenCV and Python.', bom: ['USB Camera', 'Raspberry Pi', 'Wide-angle Lens', 'LED Ring'] }
-            }
-        };
+        // ============ DATA ============
+        let savedDesigns = JSON.parse(localStorage.getItem('robotDesigns')) || [];
+        let currentRobotParts = [];
+        let currentTheme = '#FFD700';
 
-        // Theme Toggle
-        function toggleTheme() {
-            document.body.classList.toggle('dark-mode');
-            localStorage.setItem('theme', document.body.classList.contains('dark-mode') ? 'dark' : 'light');
+        // ============ DRAG & DROP ============
+        function allowDrop(ev) {
+            ev.preventDefault();
         }
 
-        // Load saved theme
-        window.addEventListener('load', () => {
-            const savedTheme = localStorage.getItem('theme');
-            if (savedTheme === 'dark') {
-                document.body.classList.add('dark-mode');
-            }
-
-            // Initialize all sections
-            generateProjects();
-            generateProducts();
-            generateCoursesGrid();
-            generateBlogPosts();
-            generateForumPosts();
-            setupScrollAnimation();
-        });
-
-        // Section Navigation
-        function showSection(sectionId) {
-            document.querySelectorAll('.section').forEach(s => s.style.display = 'none');
-            document.getElementById(sectionId).style.display = 'block';
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+        function drag(ev) {
+            ev.dataTransfer.setData("component", ev.target.closest('.component-card').dataset.component);
         }
 
-        function scrollToSection(sectionId) {
-            const section = document.getElementById(sectionId);
-            if (section) {
-                window.scrollTo({ top: 0, behavior: 'smooth' });
+        function drop(ev) {
+            ev.preventDefault();
+            const component = ev.dataTransfer.getData("component");
+            if (component) {
+                addComponent(component);
             }
         }
 
-        // Modal Functions
-        function openModal(modalId) {
-            document.getElementById(modalId).classList.add('active');
-        }
-
-        function closeModal(modalId) {
-            document.getElementById(modalId).classList.remove('active');
-        }
-
-        // Search Functionality
-        function toggleSearch() {
-            document.getElementById('searchContainer').classList.toggle('active');
-        }
-
-        document.getElementById('searchInput')?.addEventListener('input', (e) => {
-            const query = e.target.value.toLowerCase();
-            const resultsDiv = document.getElementById('searchResults');
-            resultsDiv.innerHTML = '';
-
-            if (query.length < 2) return;
-
-            const results = [];
+        function addComponent(emoji) {
+            const placeholder = document.getElementById('placeholder');
+            const robotParts = document.getElementById('robotParts');
             
-            data.projects.forEach(p => {
-                if (p.name.toLowerCase().includes(query)) {
-                    results.push({ type: 'Project', name: p.name });
+            placeholder.style.display = 'none';
+            robotParts.style.display = 'flex';
+
+            const part = document.createElement('div');
+            part.className = 'robot-part';
+            part.textContent = emoji;
+            part.onclick = function() {
+                if (confirm('Remove this component?')) {
+                    part.remove();
+                    currentRobotParts = currentRobotParts.filter(p => p !== emoji);
+                    if (currentRobotParts.length === 0) {
+                        placeholder.style.display = 'block';
+                        robotParts.style.display = 'none';
+                    }
                 }
-            });
+            };
 
-            data.products.forEach(p => {
-                if (p.name.toLowerCase().includes(query)) {
-                    results.push({ type: 'Product', name: p.name });
-                }
-            });
-
-            data.blogs.forEach(b => {
-                if (b.title.toLowerCase().includes(query)) {
-                    results.push({ type: 'Blog', name: b.title });
-                }
-            });
-
-            results.slice(0, 8).forEach(result => {
-                const div = document.createElement('div');
-                div.className = 'search-result-item';
-                div.textContent = `${result.type}: ${result.name}`;
-                resultsDiv.appendChild(div);
-            });
-        });
-
-        // Projects
-        function generateProjects() {
-            const grid = document.getElementById('projectsGrid');
-            if (!grid) return;
-
-            grid.innerHTML = data.projects.map(project => `
-                <div class="card fade-in">
-                    <div style="font-size: 3rem; text-align: center; margin-bottom: 1rem;">${project.image}</div>
-                    <h3>${project.name}</h3>
-                    <p style="margin: 0.5rem 0; font-size: 0.9rem; color: #666;">By ${project.author}</p>
-                    <p style="margin: 0.5rem 0; font-size: 0.9rem;">Difficulty: <strong>${project.level}</strong></p>
-                    <div style="margin: 1rem 0; display: flex; gap: 0.5rem; align-items: center;">
-                        <span>👍 ${project.votes}</span>
-                        <span>⭐ 4.5</span>
-                    </div>
-                    <button class="btn-primary" style="width: 100%; margin-bottom: 0.5rem;" onclick="openModal('userProfileModal')">View Project</button>
-                </div>
-            `).join('');
+            robotParts.appendChild(part);
+            currentRobotParts.push(emoji);
+            showToast('✅ Component added!');
         }
 
-        function filterProjects(level) {
-            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
-            event.target.classList.add('active');
-
-            const grid = document.getElementById('projectsGrid');
-            const filtered = level === 'all' ? data.projects : data.projects.filter(p => p.level === level);
+        // ============ PROPERTIES ============
+        function updateSize(value) {
+            const sizeLabel = document.getElementById('sizeValue');
+            const parts = document.querySelectorAll('.robot-part');
             
-            grid.innerHTML = filtered.map(project => `
-                <div class="card fade-in">
-                    <div style="font-size: 3rem; text-align: center; margin-bottom: 1rem;">${project.image}</div>
-                    <h3>${project.name}</h3>
-                    <p style="margin: 0.5rem 0; font-size: 0.9rem; color: #666;">By ${project.author}</p>
-                    <p style="margin: 0.5rem 0; font-size: 0.9rem;">Difficulty: <strong>${project.level}</strong></p>
-                    <button class="btn-primary" style="width: 100%;" onclick="openModal('userProfileModal')">View</button>
-                </div>
-            `).join('');
-        }
-
-        // Products
-        function generateProducts() {
-            const grid = document.getElementById('productsGrid');
-            if (!grid) return;
-
-            grid.innerHTML = data.products.map(product => `
-                <div class="product-card fade-in">
-                    <div class="product-image">📦</div>
-                    <div class="product-info">
-                        <div class="product-name">${product.name}</div>
-                        <div class="product-price">$${product.price}</div>
-                        <div class="product-rating">⭐ ${product.rating} (${Math.floor(Math.random() * 200 + 50)} reviews)</div>
-                        <button class="add-to-cart" onclick="addToCart('${product.name}')">Add to Cart</button>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        function filterProducts(category) {
-            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
-            event.target.classList.add('active');
-
-            const grid = document.getElementById('productsGrid');
-            const filtered = category === 'all' ? data.products : data.products.filter(p => p.category === category);
+            let size = 'Medium';
+            let scale = 1;
             
-            grid.innerHTML = filtered.map(product => `
-                <div class="product-card fade-in">
-                    <div class="product-image">📦</div>
-                    <div class="product-info">
-                        <div class="product-name">${product.name}</div>
-                        <div class="product-price">$${product.price}</div>
-                        <div class="product-rating">⭐ ${product.rating}</div>
-                        <button class="add-to-cart" onclick="addToCart('${product.name}')">Add to Cart</button>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        function addToCart(product) {
-            showSuccess(`Added "${product}" to cart!`);
-        }
-
-        // Courses
-        function generateCoursesGrid() {
-            ['beginner', 'intermediate', 'advanced'].forEach(level => {
-                const grid = document.getElementById(`${level}CoursesGrid`);
-                if (!grid) return;
-
-                grid.innerHTML = data.courses[level].map(course => `
-                    <div class="card fade-in">
-                        <h3>📖 ${course.title}</h3>
-                        <p style="margin: 1rem 0; font-size: 0.9rem;">Duration: ${course.duration}</p>
-                        <p style="margin: 0.5rem 0; font-size: 0.9rem; color: #666;">Students: ${course.students}</p>
-                        <div style="margin: 1.5rem 0; font-size: 1.3rem; color: var(--accent); font-weight: 700;">$${course.price}</div>
-                        <button class="btn-primary" style="width: 100%; margin-bottom: 0.5rem;">Enroll Now</button>
-                        <button class="btn-primary" style="width: 100%; background: transparent; border: 2px solid var(--primary); color: var(--text-dark);" onclick="addToCart('${course.title} Course')">Preview</button>
-                    </div>
-                `).join('');
+            if (value <= 1.5) {
+                size = 'Small';
+                scale = 0.8;
+            } else if (value >= 2.5) {
+                size = 'Large';
+                scale = 1.2;
+            }
+            
+            sizeLabel.textContent = size;
+            parts.forEach(part => {
+                part.style.transform = `scale(${scale})`;
             });
         }
 
-        function switchCourseTab(level) {
-            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+        function changeTheme(color, element) {
+            currentTheme = color;
+            document.querySelectorAll('.color-option').forEach(opt => opt.classList.remove('active'));
+            element.classList.add('active');
+            document.documentElement.style.setProperty('--primary', color);
+            showToast('🎨 Theme changed!');
+        }
+
+        // ============ ACTIONS ============
+        function saveDesign() {
+            const name = document.getElementById('robotName').value || 'Unnamed Robot';
+            const design = {
+                id: Date.now(),
+                name: name,
+                parts: [...currentRobotParts],
+                theme: currentTheme,
+                date: new Date().toLocaleDateString()
+            };
+
+            savedDesigns.push(design);
+            localStorage.setItem('robotDesigns', JSON.stringify(savedDesigns));
+            updateSavedBadge();
+            loadSavedDesigns();
+            showToast('💾 Design saved successfully!');
+        }
+
+        function exportDesign() {
+            const canvas = document.getElementById('robotCanvas');
+            const name = document.getElementById('robotName').value || 'robot';
             
-            event.target.classList.add('active');
-            document.getElementById(`${level}-courses`).classList.add('active');
+            showToast('📥 Exporting design...');
+            setTimeout(() => {
+                showToast('✅ Design exported as ' + name + '.png');
+            }, 1500);
         }
 
-        // Blog
-        function generateBlogPosts() {
-            const grid = document.getElementById('blogGrid');
-            if (!grid) return;
-
-            grid.innerHTML = data.blogs.map(blog => `
-                <div class="blog-card fade-in">
-                    <div class="blog-card-image">${blog.emoji}</div>
-                    <div class="blog-card-content">
-                        <h3>${blog.title}</h3>
-                        <div class="date">${blog.date}</div>
-                        <p>Discover the latest insights and updates from the robotics community.</p>
-                        <a class="read-more">Read More →</a>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        // Forum
-        function generateForumPosts() {
-            const container = document.getElementById('forumPosts');
-            if (!container) return;
-
-            const posts = [
-                { author: 'Alex Dev', title: 'How to calibrate servo motors?', category: 'Help', replies: 12, date: '2 hours ago' },
-                { author: 'Bot Master', title: 'Sharing my new drone project', category: 'Showcase', replies: 28, date: '1 day ago' },
-                { author: 'Pro Builder', title: 'Best practices for circuit design', category: 'Tips', replies: 15, date: '3 days ago' },
-            ];
-
-            container.innerHTML = posts.map(post => `
-                <div class="forum-post fade-in">
-                    <div class="forum-post-header">
-                        <div>
-                            <h3 style="margin-bottom: 0.5rem;">${post.title}</h3>
-                            <span style="background: rgba(255, 165, 0, 0.2); padding: 0.3rem 0.8rem; border-radius: 15px; font-size: 0.8rem;">${post.category}</span>
-                        </div>
-                        <div style="text-align: right;">
-                            <div class="post-author">${post.author}</div>
-                            <div class="post-date">${post.date}</div>
-                        </div>
-                    </div>
-                    <div class="post-replies">
-                        <span onclick="openModal('forumModal')">💬 ${post.replies} Replies</span>
-                        <span>👍 ${Math.floor(Math.random() * 50)}</span>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        // Guide Modal
-        function openGuideModal(guideId) {
-            const guide = data.guides[guideId];
-            if (!guide) return;
-
-            document.getElementById('guideTitle').textContent = guide.title;
-            document.getElementById('guideContent').textContent = guide.content;
-            
-            const bomList = document.getElementById('billOfMaterials');
-            bomList.innerHTML = guide.bom.map(item => `<li>${item}</li>`).join('');
-            document.getElementById('guideBOM').style.display = 'block';
-
-            openModal('guideModal');
-        }
-
-        // Project Builder
-        function saveProject() {
-            const name = document.getElementById('projectName').value;
-            if (name) {
-                showSuccess(`Project "${name}" saved successfully!`);
-                closeModal('projectBuilderModal');
+        function clearCanvas() {
+            if (confirm('Clear the entire canvas?')) {
+                document.getElementById('robotParts').innerHTML = '';
+                document.getElementById('placeholder').style.display = 'block';
+                document.getElementById('robotParts').style.display = 'none';
+                currentRobotParts = [];
+                showToast('🗑️ Canvas cleared!');
             }
         }
 
-        // Cost Calculator
-        let calculatorItems = [];
-
-        function addCalculatorItem() {
-            calculatorItems.push({ name: 'Item', price: 0 });
-            updateCalculator();
-        }
-
-        function updateCalculator() {
-            const total = calculatorItems.reduce((sum, item) => sum + item.price, 0);
-            document.getElementById('totalCost').textContent = total.toFixed(2);
-        }
-
-        function exportCalculation() {
-            showSuccess('Budget exported as PDF!');
-        }
-
-        // Forum
-        function postForum() {
-            const title = document.getElementById('forumTitle').value;
-            if (title) {
-                generateForumPosts();
-                showSuccess('Discussion posted successfully!');
-                closeModal('forumModal');
+        function loadSavedDesigns() {
+            const container = document.getElementById('savedDesigns');
+            if (savedDesigns.length === 0) {
+                container.innerHTML = '<div class="design-card"><div class="design-preview">🤖</div><div class="design-name">No designs yet</div><div class="design-date">Start creating!</div></div>';
+                return;
             }
+
+            container.innerHTML = savedDesigns.map(design => `
+                <div class="design-card" onclick="loadDesign(${design.id})">
+                    <div class="design-preview">${design.parts.slice(0, 3).join('')}</div>
+                    <div class="design-name">${design.name}</div>
+                    <div class="design-date">${design.date}</div>
+                </div>
+            `).join('');
         }
 
-        // Chatbot
-        function toggleChatbot() {
-            document.getElementById('chatbotContainer').classList.toggle('active');
-            document.getElementById('chatbotToggle').classList.toggle('active');
+        function loadDesign(id) {
+            const design = savedDesigns.find(d => d.id === id);
+            if (!design) return;
+
+            clearCanvas();
+            design.parts.forEach(part => addComponent(part));
+            document.getElementById('robotName').value = design.name;
+            changeTheme(design.theme, document.querySelector(`.color-option[style*="${design.theme}"]`));
+            showToast('✅ Design loaded!');
+            scrollToDesigner();
         }
 
-        document.getElementById('chatbotToggle')?.addEventListener('click', toggleChatbot);
-
-        function askQuestion(button) {
-            const question = button.getAttribute('data-question');
-            document.getElementById('chatInput').value = question;
-            sendChatMessage();
+        function updateSavedBadge() {
+            const badge = document.getElementById('savedBadge');
+            badge.textContent = savedDesigns.length;
+            badge.style.display = savedDesigns.length > 0 ? 'flex' : 'none';
         }
 
-        function sendChatMessage() {
+        // ============ CHAT ============
+        function toggleChat() {
+            document.getElementById('chatWindow').classList.toggle('active');
+        }
+
+        function sendMessage() {
             const input = document.getElementById('chatInput');
             const message = input.value.trim();
-            
             if (!message) return;
 
-            addChatMessage(message, 'user');
+            const container = document.getElementById('chatMessages');
+            container.innerHTML += `<div class="message user">${message}</div>`;
             input.value = '';
 
             setTimeout(() => {
-                const responses = [
-                    'Great question! Let me help you with that. You can start with Arduino by downloading the IDE from arduino.cc',
-                    'For robotics, you\'ll typically need a microcontroller like Arduino or Raspberry Pi, some motors, sensors, and a power supply.',
-                    'Building a robot arm is complex but rewarding. Start with a 3-DOF arm and master the fundamentals first.',
-                    'Popular beginner projects include line-following robots, obstacle avoiders, and simple arm manipulators.',
-                    'That\'s a great idea! I\'d recommend checking out our guides section for detailed tutorials.',
-                ];
-                const response = responses[Math.floor(Math.random() * responses.length)];
-                addChatMessage(response, 'bot');
-            }, 500);
-        }
+                const responses = {
+                    'how to start': 'Simply drag components from the left panel and drop them on the canvas! Start with a head 🤖 and build from there.',
+                    'component tips': 'Try combining different components! A good robot usually has: Head + Body + Arms/Legs + some sensors or tools.',
+                    'export help': 'Click the "Export Image" button to download your robot design as a PNG file!',
+                    'default': 'Great question! Try dragging components to the canvas and customize using the properties panel on the right. You can also save your designs!'
+                };
 
-        function addChatMessage(text, sender) {
-            const messagesDiv = document.getElementById('chatbotMessages');
-            const messageDiv = document.createElement('div');
-            messageDiv.className = `message ${sender}`;
-            
-            const avatar = document.createElement('div');
-            avatar.className = 'message-avatar';
-            avatar.textContent = sender === 'bot' ? '🤖' : '👤';
-            
-            const content = document.createElement('div');
-            content.className = 'message-content';
-            content.textContent = text;
-            
-            messageDiv.appendChild(avatar);
-            messageDiv.appendChild(content);
-            messagesDiv.appendChild(messageDiv);
-            messagesDiv.scrollTop = messagesDiv.scrollHeight;
-
-            if (sender === 'user') {
-                const quickQuestions = messagesDiv.querySelector('.quick-questions');
-                if (quickQuestions) {
-                    quickQuestions.remove();
-                }
-            }
-        }
-
-        // Troubleshooting
-        function getTroubleshootingHelp() {
-            const question = document.getElementById('troubleQuestion').value;
-            if (!question) return;
-
-            const solutions = [
-                'Check your wiring connections first. A simple loose wire can cause many problems.',
-                'Make sure your power supply is providing enough current for all components.',
-                'Try resetting your microcontroller and re-uploading the code.',
-                'Check the sensor calibration and verify it\'s getting power and ground correctly.',
-                'Use a multimeter to test individual components for continuity.',
-            ];
-
-            const solution = solutions[Math.floor(Math.random() * solutions.length)];
-            document.getElementById('troubleshootingResults').innerHTML = `
-                <div style="background: #f5f5f5; padding: 1.5rem; border-radius: 10px; margin-top: 1.5rem;">
-                    <h4 style="margin-bottom: 1rem;">💡 Suggested Solution:</h4>
-                    <p>${solution}</p>
-                    <button class="btn-primary" style="margin-top: 1rem;" onclick="openModal('userProfileModal')">Ask Community</button>
-                </div>
-            `;
-        }
-
-        // Newsletter
-        function subscribeNewsletter() {
-            const email = document.getElementById('newsletterEmail').value;
-            if (email) {
-                showSuccess('Successfully subscribed to newsletter!');
-                closeModal('newsletterModal');
-            }
-        }
-
-        // Rating
-        let currentRating = 0;
-
-        function setRating(rating) {
-            currentRating = rating;
-            document.querySelectorAll('#ratingStars .star').forEach((star, index) => {
-                if (index < rating) {
-                    star.classList.add('filled');
-                } else {
-                    star.classList.remove('filled');
-                }
-            });
-        }
-
-        function submitReview() {
-            if (currentRating > 0) {
-                showSuccess(`Thanks for your ${currentRating}-star review!`);
-                closeModal('ratingModal');
-            }
-        }
-
-        // Success Message
-        function showSuccess(message) {
-            const div = document.createElement('div');
-            div.className = 'success-message show';
-            div.textContent = message;
-            document.body.appendChild(div);
-
-            setTimeout(() => {
-                div.remove();
-            }, 3000);
-        }
-
-        // Scroll Animation
-        function setupScrollAnimation() {
-            const observerOptions = {
-                threshold: 0.1,
-                rootMargin: '0px 0px -50px 0px'
-            };
-
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        entry.target.classList.add('visible');
+                let response = responses.default;
+                const lowerMessage = message.toLowerCase();
+                for (let key in responses) {
+                    if (lowerMessage.includes(key)) {
+                        response = responses[key];
+                        break;
                     }
-                });
-            }, observerOptions);
+                }
 
-            document.querySelectorAll('.fade-in').forEach(el => {
-                observer.observe(el);
-            });
+                container.innerHTML += `<div class="message bot">${response}</div>`;
+                container.scrollTop = container.scrollHeight;
+            }, 500);
+
+            container.scrollTop = container.scrollHeight;
         }
 
-        // Click outside modals to close
-        window.addEventListener('click', (e) => {
-            if (e.target.classList.contains('modal')) {
-                e.target.classList.remove('active');
-            }
-        });
+        function askBot(question) {
+            document.getElementById('chatInput').value = question;
+            sendMessage();
+        }
 
-        console.log('✅ RoboBuilder Platform Loaded!');
+        // ============ MODALS ============
+        function openModal(type) {
+            document.getElementById(type + 'Modal').classList.add('active');
+            if (type === 'saved') {
+                const content = document.getElementById('savedModalContent');
+                if (savedDesigns.length === 0) {
+                    content.innerHTML = '<p>No saved designs yet. Start creating!</p>';
+                } else {
+                    content.innerHTML = '<div class="saved-designs">' + savedDesigns.map(design => `
+                        <div class="design-card" onclick="loadDesign(${design.id})">
+                            <div class="design-preview">${design.parts.slice(0, 3).join('')}</div>
+                            <div class="design-name">${design.name}</div>
+                            <div class="design-date">${design.date}</div>
+                        </div>
+                    `).join('') + '</div>';
+                }
+            }
+        }
+
+        function closeModal(type) {
+            document.getElementById(type + 'Modal').classList.remove('active');
+        }
+
+        // ============ THEME ============
+        function toggleDarkMode() {
+            document.body.classList.toggle('dark-mode');
+            const icon = document.getElementById('themeIcon');
+            icon.textContent = document.body.classList.contains('dark-mode') ? '☀️' : '🌙';
+        }
+
+        // ============ UTILITY ============
+        function showToast(message, error = false) {
+            const toast = document.createElement('div');
+            toast.className = 'toast' + (error ? ' error' : '');
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+
+        function scrollToDesigner() {
+            document.getElementById('designer').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // ============ INIT ============
+        window.onload = function() {
+            loadSavedDesigns();
+            updateSavedBadge();
+        };
+
+        // Close modals on outside click
+        window.onclick = function(event) {
+            if (event.target.classList.contains('modal')) {
+                event.target.classList.remove('active');
+            }
+        };
     </script>
 </body>
 </html>
